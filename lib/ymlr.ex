@@ -21,8 +21,8 @@ defmodule Ymlr do
     iex> Ymlr.document!({"comment", %{a: 1}})
     "---\\n# comment\\na: 1\\n"
 
-    iex> Ymlr.document!({["line 1", "line 2"], %{a: 1}})
-    "---\\n# line 1\\n# line 2\\na: 1\\n"
+    iex> Ymlr.document!({["comment 1", "comment 2"], %{a: 1}})
+    "---\\n# comment 1\\n# comment 2\\na: 1\\n"
 
     iex> Ymlr.document!({[], {"a", "b"}})
     ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
@@ -54,8 +54,8 @@ defmodule Ymlr do
     iex> Ymlr.document({"comment", %{a: 1}})
     {:ok, "---\\n# comment\\na: 1\\n"}
 
-    iex> Ymlr.document({["line 1", "line 2"], %{a: 1}})
-    {:ok, "---\\n# line 1\\n# line 2\\na: 1\\n"}
+    iex> Ymlr.document({["comment 1", "comment 2"], %{a: 1}})
+    {:ok, "---\\n# comment 1\\n# comment 2\\na: 1\\n"}
 
     iex> Ymlr.document({[], {"a", "b"}})
     {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
