@@ -1,0 +1,15 @@
+name: Run tests on versions according to .tool-versions
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - uses: actions/checkout@v1.0.0
+      - name: asdf_install
+        uses: asdf-vm/actions/install@v1
+      - run: mix local.rebar --force
+      - run: mix local.hex --force
+      - run: mix deps.get
+      - run: mix test
+
