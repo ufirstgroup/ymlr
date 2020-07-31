@@ -11,18 +11,11 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        elixir: [1.10.x]
-        otp: [22.x,23.x]
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup erlang
-        uses: gleam-lang/setup-erlang@v1.1.0
-        with:
-          elixir-version: ${{matrix.elixir}}
-          otp-version: ${{matrix.otp}}
+      - name: asdf_install
+        uses: asdf-vm/actions/install@v1
 
       - name: Retrieve Mix Dependencies Cache
         uses: actions/cache@v1
