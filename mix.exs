@@ -4,15 +4,15 @@ defmodule Ymlr.MixProject do
   def project do
     [
       app: :ymlr,
-      description: "A YAML Encoder",
+      description: "A YAML encoder for Elixir",
       version: "0.0.1",
       elixir: "~> 1.10",
       deps: deps(),
       dialyzer: dialyzer(),
+      package: package(),
       preferred_cli_env: cli_env(),
       test_coverage: [tool: ExCoveralls],
       test_paths: ["lib"],
-
     ]
   end
 
@@ -49,6 +49,17 @@ defmodule Ymlr.MixProject do
       plt_add_apps: [:mix, :eex],
       plt_core_path: "priv/plts",
       plt_file: {:no_warn, "priv/plts/k8s.plt"}
+    ]
+  end
+
+  defp package do
+    [
+      name: :ymlr,
+      maintainers: ["Michael Ruoss", "Jean-Luc Geering"],
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/ufirstgroup/ymlr"
+      }
     ]
   end
 end
