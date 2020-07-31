@@ -80,9 +80,9 @@ defmodule Ymlr.Encoder do
       {key, nil} -> "#{key}:"
       {key, value} when value == [] -> "#{key}: []"
       {key, value} when value == %{} -> "#{key}: {}"
-      {key, value} when is_map(value)  -> ["#{key}:" | [indentation | ["  " | encode_as_io_list(value, level+1)]]]
-      {key, value} when is_list(value) -> ["#{key}:" | [indentation | ["  " | encode_as_io_list(value, level+1)]]]
-      {key, value} -> ["#{key}: " | encode_as_io_list(value, level+1)]
+      {key, value} when is_map(value)  -> ["#{key}:" | [indentation | ["  " | encode_as_io_list(value, level + 1)]]]
+      {key, value} when is_list(value) -> ["#{key}:" | [indentation | ["  " | encode_as_io_list(value, level + 1)]]]
+      {key, value} -> ["#{key}: " | encode_as_io_list(value, level + 1)]
     end)
     |> Enum.intersperse(indentation)
   end
@@ -93,7 +93,7 @@ defmodule Ymlr.Encoder do
     |> Enum.map(fn
       nil -> "-"
       "" -> ~s(- "")
-      value -> ["- " | encode_as_io_list(value, level+1)]
+      value -> ["- " | encode_as_io_list(value, level + 1)]
     end)
     |> Enum.intersperse(indentation)
   end
@@ -161,6 +161,5 @@ defmodule Ymlr.Encoder do
   defp indent(level) do
     ["\n" | List.duplicate("  ", level)]
   end
-
 
 end
