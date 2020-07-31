@@ -41,38 +41,65 @@ defmodule Ymlr.Encoder do
       iex> Ymlr.Encoder.to_s!({"a", "b"})
       ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
   """
-  @spec to_s!(data, binary()) :: binary()
-  def to_s!(data, nl \\ "\n")
+  @spec to_s!(data) :: binary()
+  def to_s!(data) do
+    data
+    |> encode_as_io_list()
+    |> IO.iodata_to_binary()
+  end
 
-  def to_s!(data, _nl) when data == %{} do
+  @doc """
+  Encodes the given data as YAML string.
+
+  ## Examples
+
+      iex> Ymlr.Encoder.to_s(%{a: 1, b: 2})
+      {:ok, "a: 1\\nb: 2"}
+
+      iex> Ymlr.Encoder.to_s({"a", "b"})
+      {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
+  """
+  @spec to_s(data) :: {:ok, binary()} | {:error, binary()}
+  def to_s(data) do
+    yml = to_s!(data)
+    {:ok, yml}
+  rescue
+    e in ArgumentError -> {:error, e.message}
+  end
+
+  defp encode_as_io_list(data, level \\ 0)
+
+  defp encode_as_io_list(data, _level) when data == %{} do
     "{}"
   end
 
-  def to_s!(data, nl) when is_map(data) do
+  defp encode_as_io_list(data, level) when is_map(data) do
+    indentation = indent(level)
     data
     |> Enum.map(fn
       {key, nil} -> "#{key}:"
       {key, value} when value == [] -> "#{key}: []"
       {key, value} when value == %{} -> "#{key}: {}"
-      {key, value} when is_map(value)  -> "#{key}:" <> nl <> "  " <> to_s!(value, nl <> "  ")
-      {key, value} when is_list(value) -> "#{key}:" <> nl <> "  " <> to_s!(value, nl <> "  ")
-      {key, value} -> "#{key}: " <> to_s!(value, nl <> "  ")
+      {key, value} when is_map(value)  -> ["#{key}:" | [indentation | ["  " | encode_as_io_list(value, level+1)]]]
+      {key, value} when is_list(value) -> ["#{key}:" | [indentation | ["  " | encode_as_io_list(value, level+1)]]]
+      {key, value} -> ["#{key}: " | encode_as_io_list(value, level+1)]
     end)
-    |> Enum.join(nl)
+    |> Enum.intersperse(indentation)
   end
 
-  def to_s!(data, nl) when is_list(data) do
+  defp encode_as_io_list(data, level) when is_list(data) do
+    indentation = indent(level)
     data
     |> Enum.map(fn
       nil -> "-"
       "" -> ~s(- "")
-      value -> "- " <> to_s!(value, nl <> "  ")
+      value -> ["- " | encode_as_io_list(value, level+1)]
     end)
-    |> Enum.join(nl)
+    |> Enum.intersperse(indentation)
   end
 
-  def to_s!(data, _) when is_atom(data), do: Atom.to_string(data)
-  def to_s!(data, nl) when is_binary(data) do
+  defp encode_as_io_list(data, _) when is_atom(data), do: Atom.to_string(data)
+  defp encode_as_io_list(data, level) when is_binary(data) do
     cond do
       data == "" -> ~S('')
       data == "null" -> ~S('null')
@@ -82,7 +109,7 @@ defmodule Ymlr.Encoder do
       data == "false" -> ~S('false')
       data == "True" -> ~S('True')
       data == "False" -> ~S('False')
-      String.contains?(data, "\n") -> multiline(data, nl)
+      String.contains?(data, "\n") -> multiline(data, level)
       String.at(data, 0) in @quote_when_first -> with_quotes(data)
       String.at(data, -1) in @quote_when_last -> with_quotes(data)
       String.starts_with?(data, "- ") -> with_quotes(data)
@@ -98,28 +125,9 @@ defmodule Ymlr.Encoder do
     end
   end
 
-  def to_s!(data, _) when is_number(data), do: "#{data}"
+  defp encode_as_io_list(data, _) when is_number(data), do: "#{data}"
 
-  def to_s!(data, _), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML.")
-
-  @doc """
-  Encodes the given data as YAML string.
-
-  ## Examples
-
-      iex> Ymlr.Encoder.to_s(%{a: 1, b: 2})
-      {:ok, "a: 1\\nb: 2"}
-
-      iex> Ymlr.Encoder.to_s({"a", "b"})
-      {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
-  """
-  @spec to_s(data, binary()) :: {:ok, binary()} | {:error, binary()}
-  def to_s(data, nl \\ "\n") do
-    yml = to_s!(data, nl)
-    {:ok, yml}
-  rescue
-    e in ArgumentError -> {:error, e.message}
-  end
+  defp encode_as_io_list(data, _), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML.")
 
   defp is_numeric(string) do
     case Float.parse(string) do
@@ -141,12 +149,18 @@ defmodule Ymlr.Encoder do
   end
 
   # see https://yaml-multiline.info/
-  defp multiline(data, nl) do
-    block = data |> String.trim_trailing("\n") |> String.replace("\n", nl)
-    block_chomping_indicator(data) <> nl <> block
+  defp multiline(data, level) do
+    indentation = indent(level)
+    block = data |> String.trim_trailing("\n") |> String.replace("\n", IO.iodata_to_binary(indentation))
+    [block_chomping_indicator(data) | [indentation | block]]
   end
   defp block_chomping_indicator(data) do
     if String.ends_with?(data, "\n"), do: "|", else: "|-"
   end
+
+  defp indent(level) do
+    ["\n" | List.duplicate("  ", level)]
+  end
+
 
 end
