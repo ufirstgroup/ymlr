@@ -2,8 +2,8 @@
 
 ymlr - A YAML encoder for Elixir.
 
-[![Build Status](https://travis-ci.org/ufirstgroup/yml.svg?branch=master)](https://travis-ci.org/ufirstgroup/yml)
-[![Coverage Status](https://coveralls.io/repos/github/ufirstgroup/yml/badge.svg?branch=master)](https://coveralls.io/github/ufirstgroup/yml?branch=master)
+[![Build Status](https://github.com/ufirstgroup/ymlr/workflows/CI/badge.svg)](https://github.com/ufirstgroup/ymlr/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/github/ufirstgroup/ymlr/badge.svg?branch=master)](https://coveralls.io/github/ufirstgroup/ymlr?branch=master)
 [![Hex.pm](http://img.shields.io/hexpm/v/ymlr.svg?style=flat)](https://hex.pm/packages/ymlr)
 [![Documentation](https://img.shields.io/badge/documentation-on%20hexdocs-green.svg)](https://hexdocs.pm/ymlr/)
 ![Hex.pm](https://img.shields.io/hexpm/l/ymlr.svg?style=flat)
