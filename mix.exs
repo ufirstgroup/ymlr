@@ -5,7 +5,7 @@ defmodule Ymlr.MixProject do
     [
       app: :ymlr,
       description: "A YAML Encoder",
-      version: "0.1.0",
+      version: "0.0.1",
       elixir: "~> 1.10",
       deps: deps(),
       dialyzer: dialyzer(),

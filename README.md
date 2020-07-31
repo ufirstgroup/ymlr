@@ -1,6 +1,13 @@
 # ymlr - A YAML Encoder for Elixir
 
-ymlr is an elixir library to encode data into YAML documents.
+ymlr - A YAML encoder for Elixir.
+
+[![Build Status](https://travis-ci.org/ufirstgroup/yml.svg?branch=master)](https://travis-ci.org/ufirstgroup/yml)
+[![Coverage Status](https://coveralls.io/repos/github/ufirstgroup/yml/badge.svg?branch=master)](https://coveralls.io/github/ufirstgroup/yml?branch=master)
+[![Hex.pm](http://img.shields.io/hexpm/v/ymlr.svg?style=flat)](https://hex.pm/packages/ymlr)
+[![Documentation](https://img.shields.io/badge/documentation-on%20hexdocs-green.svg)](https://hexdocs.pm/ymlr/)
+![Hex.pm](https://img.shields.io/hexpm/l/ymlr.svg?style=flat)
+
 
 ## Examples
 
@@ -45,3 +52,9 @@ ymlr is an elixir library to encode data into YAML documents.
     b: 2
     """
 ```
+
+## A Word on Stability
+
+This library is still in beta and should not be used in production. While it encodes most of the given data correctly,
+there might still be some edge cases we haven't come across yet. Please help us find and fix those, preferably by
+creating a pull request.
