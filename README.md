@@ -8,6 +8,17 @@ ymlr - A YAML encoder for Elixir.
 [![Documentation](https://img.shields.io/badge/documentation-on%20hexdocs-green.svg)](https://hexdocs.pm/ymlr/)
 ![Hex.pm](https://img.shields.io/hexpm/l/ymlr.svg?style=flat)
 
+## Installation
+
+The package can be installed by adding `ymlr` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:ymlr, "~> 0.0.1"}
+  ]
+end
+```
 
 ## Examples
 
