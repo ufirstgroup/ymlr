@@ -13,6 +13,10 @@ defmodule Ymlr.MixProject do
       preferred_cli_env: cli_env(),
       test_coverage: [tool: ExCoveralls],
       test_paths: ["lib"],
+      docs: [
+        main: "Ymlr",
+      ]
+
     ]
   end
 
