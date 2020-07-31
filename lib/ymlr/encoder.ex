@@ -29,17 +29,17 @@ defmodule Ymlr.Encoder do
 
   ## Examples
 
-    iex> Ymlr.Encoder.to_s!(%{})
-    "{}"
+      iex> Ymlr.Encoder.to_s!(%{})
+      "{}"
 
-    iex> Ymlr.Encoder.to_s!(%{a: 1, b: 2})
-    "a: 1\\nb: 2"
+      iex> Ymlr.Encoder.to_s!(%{a: 1, b: 2})
+      "a: 1\\nb: 2"
 
-    iex> Ymlr.Encoder.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
-    "a: a\\nb: b\\nc: 'true'\\nd: '100'"
+      iex> Ymlr.Encoder.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
+      "a: a\\nb: b\\nc: 'true'\\nd: '100'"
 
-    iex> Ymlr.Encoder.to_s!({"a", "b"})
-    ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
+      iex> Ymlr.Encoder.to_s!({"a", "b"})
+      ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
   """
   @spec to_s!(data, binary()) :: binary()
   def to_s!(data, nl \\ "\n")
@@ -107,11 +107,11 @@ defmodule Ymlr.Encoder do
 
   ## Examples
 
-    iex> Ymlr.Encoder.to_s(%{a: 1, b: 2})
-    {:ok, "a: 1\\nb: 2"}
+      iex> Ymlr.Encoder.to_s(%{a: 1, b: 2})
+      {:ok, "a: 1\\nb: 2"}
 
-    iex> Ymlr.Encoder.to_s({"a", "b"})
-    {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
+      iex> Ymlr.Encoder.to_s({"a", "b"})
+      {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
   """
   @spec to_s(data, binary()) :: {:ok, binary()} | {:error, binary()}
   def to_s(data, nl \\ "\n") do
