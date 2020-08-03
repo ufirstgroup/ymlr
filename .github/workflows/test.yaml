@@ -1,9 +1,5 @@
 name: Run tests on versions according to .tool-versions
 on: push
-
-env:
-  MIX_ENV: test
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -24,5 +20,5 @@ jobs:
       - run: mix local.hex --force
       - run: mix deps.get
       - run: mix compile --warnings-as-errors
-      - run: mix coveralls.github
+      - run: mix test
 
