@@ -1,5 +1,9 @@
 name: Run tests on versions according to .tool-versions
 on: push
+
+env:
+  MIX_ENV: test
+
 jobs:
   test:
     runs-on: ubuntu-latest

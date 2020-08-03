@@ -32,7 +32,8 @@ defmodule Ymlr.MixProject do
       "coveralls.detail": :test,
       "coveralls.post": :test,
       "coveralls.html": :test,
-      "coveralls.travis": :test
+      "coveralls.travis": :test,
+      "coveralls.github": :test,
     ]
   end
 
@@ -40,7 +41,7 @@ defmodule Ymlr.MixProject do
     [
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.12", only: [:test]},
+      {:excoveralls, "~> 0.13", only: [:test]},
       {:ex_doc, "~> 0.20", only: :dev},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:yaml_elixir, "~> 2.4", only: [:test]},
