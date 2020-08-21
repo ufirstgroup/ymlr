@@ -15,7 +15,7 @@ The package can be installed by adding `ymlr` to your list of dependencies in `m
 ```elixir
 def deps do
   [
-    {:ymlr, "~> 0.0.1"}
+    {:ymlr, "~> 1.0"}
   ]
 end
 ```
