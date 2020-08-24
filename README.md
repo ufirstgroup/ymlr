@@ -63,9 +63,3 @@ end
     b: 2
     """
 ```
-
-## A Word on Stability
-
-This library is still in beta and should not be used in production. While it encodes most of the given data correctly,
-there might still be some edge cases we haven't come across yet. Please help us find and fix those, preferably by
-creating a pull request.
