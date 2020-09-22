@@ -89,6 +89,11 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!(1.2) == "1.2"
     end
 
+    test "hex and oversize float" do
+      assert MUT.to_s!("7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718") == "7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718"
+      assert MUT.to_s!("1.7976931348623157e+309") == "1.7976931348623157e+309"
+    end
+
     test "lists" do
       assert MUT.to_s!([]) == ""
       assert MUT.to_s!([1]) == "- 1"

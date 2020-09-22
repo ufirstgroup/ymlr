@@ -134,6 +134,8 @@ defmodule Ymlr.Encoder do
       {_, ""} -> true
       _ -> false
     end
+  rescue
+    _ -> false
   end
 
   defp with_quotes(data) do
