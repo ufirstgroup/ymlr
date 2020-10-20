@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # Enable version updates for mix
+  - package-ecosystem: "mix"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependabot-update"
