@@ -5,18 +5,8 @@ defmodule YmlrTest do
   alias Ymlr, as: MUT
 
   describe "document/2" do
-
-    test "with comment" do
-      assert MUT.document!({"comment", %{a: 1}}) == "---\n# comment\na: 1\n"
-    end
-
-    test "with comments" do
-      assert MUT.document!({["line 1", "line 2"], %{a: 1}}) == "---\n# line 1\n# line 2\na: 1\n"
-    end
-
     test "no comment" do
       assert MUT.document!({[], %{a: 1}}) == "---\na: 1\n"
-      assert MUT.document!(%{a: 1}) == "---\na: 1\n"
     end
 
     test "k8s resource" do
@@ -44,25 +34,4 @@ defmodule YmlrTest do
       assert MUT.document!(input) == output
     end
   end
-
-  describe "documents/1" do
-
-    test "single" do
-      assert MUT.documents!([%{a: 1}]) == """
-      ---
-      a: 1
-      """
-    end
-
-    test "multiple" do
-      assert MUT.documents!([%{a: 1}, %{b: 2}]) == """
-      ---
-      a: 1
-
-      ---
-      b: 2
-      """
-    end
-  end
-
 end
