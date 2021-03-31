@@ -54,8 +54,7 @@ defmodule Ymlr.MixProject do
     [
       ignore_warnings: ".dialyzer_ignore.exs",
       plt_add_apps: [:mix, :eex],
-      plt_core_path: "priv/plts",
-      plt_file: {:no_warn, "priv/plts/ymlr.plt"}
+      plt_core_path: "_build/#{Mix.env()}",
     ]
   end
 
