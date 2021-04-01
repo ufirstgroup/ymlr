@@ -193,6 +193,14 @@ defmodule Ymlr.EncoderTest do
 
       assert MUT.to_s!(%{a: "a1\na2", b: "b1", c: "c1\nc2\n", d: "d1"}) == expected
     end
+
+    test "date" do
+      assert MUT.to_s!(~D[2016-05-24]) == "2016-05-24"
+    end
+
+    test "datetime" do
+      assert MUT.to_s!(DateTime.new!(~D[2016-05-24], ~T[13:26:08.003], "Etc/UTC")) == "2016-05-24 13:26:08.000000000 Z"
+    end
   end
 
 end
