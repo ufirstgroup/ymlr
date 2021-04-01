@@ -6,9 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
-* Added Date and DateTime support
+## [1.1.0] - 2021-04-01
+
+### Added
+
+* Date and DateTime support (#17)
+
+### Chores
+
+* yaml_elixir upgraded to 2.6.0
+* excoveralls upgraded to 0.14.0
+* ex_doc upgraded to 0.24.1
+* credo upgraded to 1.5.5
+* dialyxir upgraded to 1.1.0
 
 ## [1.0.1] - 2020-09-22
+
+### Changed
 
 * Rescue ArgumentError exception for oversize floats according to Float.parse/1 doc
 
