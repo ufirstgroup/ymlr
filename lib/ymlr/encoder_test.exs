@@ -199,7 +199,7 @@ defmodule Ymlr.EncoderTest do
     end
 
     test "datetime" do
-      assert MUT.to_s!(DateTime.from_naive(~N[2016-05-24 13:26:08.003], "Etc/UTC")) == "2016-05-24 13:26:08.000000000 Z"
+      assert MUT.to_s!(DateTime.from_naive!(~N[2016-05-24 13:26:08.003], "Etc/UTC")) == "2016-05-24 13:26:08.000000000 Z"
     end
   end
 
