@@ -20,6 +20,15 @@ def deps do
 end
 ```
 
+## Versions and Support
+
+Version 2.0 does not support Elixir 1.10 anymore. However, for now all functionality is backported to version 1.x.
+
+| Ymlr Version | Supported Elixir Version |
+|:-------------:|:-------------:|
+| ~> 2.0 | ~> 1.11 |
+| ~> 1.0 | ~> 1.10 |
+
 ## Examples
 
 ### Encode a single document - optionally with comments:
