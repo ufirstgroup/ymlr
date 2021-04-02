@@ -9,7 +9,7 @@ defmodule Ymlr.MixProject do
       app: :ymlr,
       description: "A YAML encoder for Elixir",
       version: @version,
-      elixir: "~> 1.11",
+      elixir: "~> 1.10",
       deps: deps(),
       dialyzer: dialyzer(),
       package: package(),
@@ -52,6 +52,7 @@ defmodule Ymlr.MixProject do
       {:excoveralls, "~> 0.13", only: [:test]},
       {:ex_doc, "~> 0.20", only: :dev},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
+      {:nimble_strftime, "~>0.1.0"},
       {:yaml_elixir, "~> 2.4", only: [:test]},
     ]
   end
