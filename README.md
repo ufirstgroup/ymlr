@@ -15,10 +15,19 @@ The package can be installed by adding `ymlr` to your list of dependencies in `m
 ```elixir
 def deps do
   [
-    {:ymlr, "~> 1.0"}
+    {:ymlr, "~> 2.0"}
   ]
 end
 ```
+
+## Versions and Support
+
+Version 2.0 does not support Elixir 1.10 anymore. However, for now all functionality is backported to version 1.x.
+
+| Ymlr Version | Supported Elixir Version |
+|:-------------:|:-------------:|
+| ~> 2.0 | ~> 1.11 |
+| ~> 1.0 | ~> 1.10 |
 
 ## Examples
 
