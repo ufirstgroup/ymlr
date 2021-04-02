@@ -1,12 +1,15 @@
 defmodule Ymlr.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/ufirstgroup/ymlr"
+  @version "1.1.0"
+
   def project do
     [
       app: :ymlr,
       description: "A YAML encoder for Elixir",
-      version: "1.1.0",
-      elixir: "~> 1.10",
+      version: @version,
+      elixir: "~> 1.11",
       deps: deps(),
       dialyzer: dialyzer(),
       package: package(),
@@ -16,7 +19,10 @@ defmodule Ymlr.MixProject do
       ],
       test_paths: ["lib"],
       docs: [
-        main: "Ymlr",
+        main: "readme",
+        extras: ["README.md"],
+        source_ref: "v#{@version}",
+        source_url: @source_url
       ]
 
     ]
@@ -65,8 +71,9 @@ defmodule Ymlr.MixProject do
       maintainers: ["Michael Ruoss", "Jean-Luc Geering"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/ufirstgroup/ymlr"
-      }
+        "GitHub" => @source_url
+      },
+      files: ["lib", "mix.exs", "README*", "LICENSE*", "CHANGELOG.md"]
     ]
   end
 end
