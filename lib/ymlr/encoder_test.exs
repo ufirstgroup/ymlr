@@ -199,7 +199,8 @@ defmodule Ymlr.EncoderTest do
     end
 
     test "datetime" do
-      assert MUT.to_s!(DateTime.new!(~D[2016-05-24], ~T[13:26:08.003000000], "Etc/UTC")) == "2016-05-24 13:26:08.003000Z"
+      {:ok, datetime, _} = DateTime.from_iso8601("2016-05-24T13:26:08,003000Z")
+      assert MUT.to_s!(datetime) == "2016-05-24 13:26:08.003000Z"
     end
   end
 
