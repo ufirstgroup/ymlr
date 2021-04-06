@@ -3,6 +3,15 @@ updates:
   # Enable version updates for mix
   - package-ecosystem: "mix"
     directory: "/"
+    target_branch: "master"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependabot-update"
+
+  - package-ecosystem: "mix"
+    directory: "/"
+    target_branch: "1.x"
     schedule:
       interval: "weekly"
     labels:
