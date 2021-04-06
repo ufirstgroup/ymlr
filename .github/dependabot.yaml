@@ -3,7 +3,7 @@ updates:
   # Enable version updates for mix
   - package-ecosystem: "mix"
     directory: "/"
-    target_branch: "master"
+    target-branch: "master"
     schedule:
       interval: "weekly"
     labels:
@@ -11,7 +11,7 @@ updates:
 
   - package-ecosystem: "mix"
     directory: "/"
-    target_branch: "1.x"
+    target-branch: "1.x"
     schedule:
       interval: "weekly"
     labels:
