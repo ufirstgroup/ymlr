@@ -22,5 +22,5 @@
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.6", "cf344f5692c82d2cd7554f5ec8fd961548d4fd09e7d22f5b62482e5aeaebd4b0", [:make, :mix, :rebar3], [], "hexpm", "bdb0d2471f453c88ff3908e7686f86f9be327d065cc1ec16fa4540197ea04680"},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.7.0", "bc84380c9ab48177092f43ac89e4dfa2c6d62b40b8bd132b1059ecc7232f9a78", [:rebar3], [], "hexpm", "25eee6d67df61960cf6a794239566599b09e17e668d3700247bc498638152521"},
   "yamerl": {:hex, :yamerl, "0.8.1", "07da13ffa1d8e13948943789665c62ccd679dfa7b324a4a2ed3149df17f453a4", [:rebar3], [], "hexpm", "96cb30f9d64344fed0ef8a92e9f16f207de6c04dfff4f366752ca79f5bceb23f"},
-  "yaml_elixir": {:hex, :yaml_elixir, "2.6.0", "1f469e4e7b006df44539685feb0a9d0d58c98230cef4ecd264ea116eb18e5d09", [:mix], [{:yamerl, "~> 0.8", [hex: :yamerl, repo: "hexpm", optional: false]}], "hexpm", "e40abb99a65e98020929d3e9b310c9f0f62aa76c3be7c0ada2aa440e12b258d9"},
+  "yaml_elixir": {:hex, :yaml_elixir, "2.7.0", "6f731d622a3b28769e26e634f82aa171d1d01cae0e8820ce9e93e559c83c23c8", [:mix], [{:yamerl, "~> 0.8", [hex: :yamerl, repo: "hexpm", optional: false]}], "hexpm", "f2eb39e0fb23625777f74e0c821f42f033dc4eaa5402c34beaa665944d85f3ea"},
 }
