@@ -61,9 +61,12 @@ jobs:
         run: mix credo --strict
 
       - name: Run Coverage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mix coveralls.github
+        run: mix coveralls.json
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./cover/excoveralls.json
 
       - name: Run dialyzer
         run: |

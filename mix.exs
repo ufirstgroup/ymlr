@@ -42,6 +42,8 @@ defmodule Ymlr.MixProject do
       "coveralls.html": :test,
       "coveralls.travis": :test,
       "coveralls.github": :test,
+      "coveralls.xml": :test,
+      "coveralls.json": :test,
     ]
   end
 
