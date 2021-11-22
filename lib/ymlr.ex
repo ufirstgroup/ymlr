@@ -30,9 +30,7 @@ defmodule Ymlr do
   @spec document!(document) :: binary()
   def document!(document)
   def document!({lines, data}) when is_list(lines) do
-    comments = lines
-    |> Enum.map(&("# #{&1}\n"))
-    |> Enum.join("")
+    comments = Enum.map_join(lines, "", &("# #{&1}\n"))
     "---\n" <> comments <> Encoder.to_s!(data) <> "\n"
   end
   def document!({comment, data}), do: document!({[comment], data})
@@ -85,11 +83,7 @@ defmodule Ymlr do
       iex> Ymlr.documents!(%{a: "a"})
       ** (ArgumentError) The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document.
   """
-  def documents!(documents) when is_list(documents) do
-    documents
-    |> Enum.map(&document!/1)
-    |> Enum.join("\n")
-  end
+  def documents!(documents) when is_list(documents), do: Enum.map_join(documents, "\n", &document!/1)
   def documents!(_documents), do:
     raise(ArgumentError, "The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document.")
 
