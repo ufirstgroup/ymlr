@@ -4,9 +4,13 @@ ymlr - A YAML encoder for Elixir.
 
 [![Build Status](https://github.com/ufirstgroup/ymlr/workflows/CI/badge.svg)](https://github.com/ufirstgroup/ymlr/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/ufirstgroup/ymlr/branch/master/graph/badge.svg?token=DSLGDW6KS9)](https://codecov.io/gh/ufirstgroup/ymlr)
+
 [![Hex.pm](http://img.shields.io/hexpm/v/ymlr.svg?style=flat)](https://hex.pm/packages/ymlr)
+[![Total Download](https://img.shields.io/hexpm/dt/ymlr.svg)](https://hex.pm/packages/ymlr)
+
 [![Documentation](https://img.shields.io/badge/documentation-on%20hexdocs-green.svg)](https://hexdocs.pm/ymlr/)
 ![Hex.pm](https://img.shields.io/hexpm/l/ymlr.svg?style=flat)
+
 
 ## Installation
 
