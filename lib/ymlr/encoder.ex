@@ -73,10 +73,10 @@ defmodule Ymlr.Encoder do
     "{}"
   end
 
-  defp encode_as_io_list(%Date{} = data, _), do: Calendar.strftime(data, "%Y-%m-%d")
+  defp encode_as_io_list(%Date{} = data, _), do: Date.to_iso8601(data)
 
   defp encode_as_io_list(%DateTime{} = data, _) do
-    data |> DateTime.shift_zone!("Etc/UTC") |> Calendar.strftime("%Y-%m-%d %H:%M:%S.000000000 Z")
+    data |> DateTime.shift_zone!("Etc/UTC") |> DateTime.to_iso8601()
   end
 
   defp encode_as_io_list(data, level) when is_map(data) do
