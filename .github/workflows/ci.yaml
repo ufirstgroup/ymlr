@@ -39,6 +39,7 @@ jobs:
           path: deps
           key: ${{runner.os}}-${{steps.beam.outputs.otp-version}}-${{steps.beam.outputs.elixir-version}}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
 
+      # Copied from the example on https://github.com/jeremyjh/dialyxir/blob/master/README.md#github-actions
       - name: Restore PLT Cache
         uses: actions/cache@v3
         id: plt_cache
