@@ -1,0 +1,239 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Usage
+
+```elixir
+Mix.install([:kino, :ymlr])
+
+full = %{
+  "atom" => :ymlr,
+  "date" => ~D[2018-11-15],
+  "date_time" => ~U[2018-11-15 11:00:00Z],
+  "list" => ["item 1", "item 2", "item 3"],
+  "nested list" => [["item 1.1", "item 1.2"], ["item 2.1", "item 2.2", "item 2.3"]],
+  "nested map" => %{
+    "some" => %{
+      "nested" => ["data"]
+    }
+  },
+  "numbers" => %{
+    "float" => 3.14159265,
+    "hex" => 0x0B1010,
+    "int" => 123,
+    "oct" => 0o777
+  },
+  "numbers as strings" => %{
+    "float" => "3.14159265",
+    "hex" => "0x0b1010",
+    "int" => "123",
+    "oct" => "0o777"
+  },
+  "string" => "hello world",
+  "string (multiline)" => "hello\nworld"
+}
+
+simple_1 = %{"message" => "hello world"}
+simple_2 = %{"message" => "nice to be here"}
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{"message" => "nice to be here"}
+```
+
+## Encoding a single document
+
+Note: We defined document data as variables `full`, `simple_1` and `simple_2` in the setup block at the top of this livebook.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+full
+|> Ymlr.document!()
+|> IO.puts()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+---
+atom: ymlr
+date:
+  2018-11-15
+date_time:
+  2018-11-15 11:00:00.000000000 Z
+list:
+  - item 1
+  - item 2
+  - item 3
+nested list:
+  - - item 1.1
+    - item 1.2
+  - - item 2.1
+    - item 2.2
+    - item 2.3
+nested map:
+  some:
+    nested:
+      - data
+numbers:
+  float: 3.14159265
+  hex: 725008
+  int: 123
+  oct: 511
+numbers as strings:
+  float: '3.14159265'
+  hex: '0x0b1010'
+  int: '123'
+  oct: '0o777'
+string: hello world
+string (multiline): |-
+  hello
+  world
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+simple_1
+|> Ymlr.document()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:ok, "---\nmessage: hello world\n"}
+```
+
+## Encoding multiple documents
+
+```elixir
+[simple_1, simple_2]
+|> Ymlr.documents!()
+|> IO.puts()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+---
+message: hello world
+
+---
+message: nice to be here
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+[simple_1, simple_2]
+|> Ymlr.documents()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:ok, "---\nmessage: hello world\n\n---\nmessage: nice to be here\n"}
+```
+
+## Adding comments
+
+To add a comment at the top of the YAML document, pass a tuple in the form `{comment, document}` to any of the functions.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+{"Single comment", simple_1}
+|> Ymlr.document!()
+|> IO.puts()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+---
+# Single comment
+message: hello world
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+The first element of the tuple can be a list of comments:
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+{["First comment", "Second Comment", "Third Comment"], simple_1}
+|> Ymlr.document!()
+|> IO.puts()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+---
+# First comment
+# Second Comment
+# Third Comment
+message: hello world
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+Multiple documents with comments:
+
+```elixir
+[
+  {["First doc, first comment", "First doc, second Comment", "First doc,  Comment"], simple_1},
+  {["Second doc, first comment", "Second doc, second comment"], simple_2}
+]
+|> Ymlr.documents!()
+|> IO.puts()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+---
+# First doc, first comment
+# First doc, second Comment
+# First doc,  Comment
+message: hello world
+
+---
+# Second doc, first comment
+# Second doc, second comment
+message: nice to be here
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```

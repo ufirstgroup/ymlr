@@ -25,6 +25,8 @@ end
 
 ## Examples
 
+See The usage livebook `usage.livemd` for more detailed examples.
+
 ### Encode a single document - optionally with comments:
 
 ```elixir

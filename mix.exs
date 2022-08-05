@@ -20,7 +20,7 @@ defmodule Ymlr.MixProject do
       test_paths: ["lib"],
       docs: [
         main: "readme",
-        extras: ["README.md", "CHANGELOG.md"],
+        extras: ["README.md", "usage.livemd", "CHANGELOG.md"],
         source_ref: "v#{@version}",
         source_url: @source_url
       ]
