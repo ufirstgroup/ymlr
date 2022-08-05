@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.0.0] - TBD
+
 ### Changed
 
 - use `Enum.map_join/3` indead of `Enum.map/2` and `Enum.join/2` as it's more efficient according to credo recommendations
-- fix #87 - change the serialization of timestamps to use the canonical (iso8601) format, i.e. before: `2022-07-31 14:48:48.000000000 Z` and now: `"2022-07-31T14:48:48Z"`
+- Change the serialization of timestamps to use the canonical (iso8601) format, i.e. before: `2022-07-31 14:48:48.000000000 Z` and now: `"2022-07-31T14:48:48Z"` ([#87](https://github.com/ufirstgroup/ymlr/issues/87), [#90](https://github.com/ufirstgroup/ymlr/pull/90))
 
 ## [2.0.0] - 2021-04-02
 
