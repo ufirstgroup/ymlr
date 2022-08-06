@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [3.0.0] - TBD
 
+**In this release we changed the way `DateTime` is encoded (see below). This can be a breaking change if you rely on the old date format with spaces. Because of this change, version 3.0.0 is now again compatible with Elixir 1.10**
+
 ### Changed
 
 - use `Enum.map_join/3` indead of `Enum.map/2` and `Enum.join/2` as it's more efficient according to credo recommendations
