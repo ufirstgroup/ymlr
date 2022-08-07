@@ -11,7 +11,6 @@ ymlr - A YAML encoder for Elixir.
 [![Documentation](https://img.shields.io/badge/documentation-on%20hexdocs-green.svg)](https://hexdocs.pm/ymlr/)
 ![Hex.pm](https://img.shields.io/hexpm/l/ymlr.svg?style=flat)
 
-
 ## Installation
 
 The package can be installed by adding `ymlr` to your list of dependencies in `mix.exs`:
@@ -19,21 +18,14 @@ The package can be installed by adding `ymlr` to your list of dependencies in `m
 ```elixir
 def deps do
   [
-    {:ymlr, "~> 2.0"}
+    {:ymlr, "~> 3.0"}
   ]
 end
 ```
 
-## Versions and Support
-
-Version 2.0 does not support Elixir 1.10 anymore. However, for now all functionality is backported to version 1.x.
-
-| Ymlr Version | Supported Elixir Version |
-|:-------------:|:-------------:|
-| ~> 2.0 | ~> 1.11 |
-| ~> 1.0 | ~> 1.10 |
-
 ## Examples
+
+See The usage livebook `usage.livemd` for more detailed examples.
 
 ### Encode a single document - optionally with comments:
 
@@ -62,7 +54,6 @@ Version 2.0 does not support Elixir 1.10 anymore. However, for now all functiona
     d: '100'
     """
 ```
-
 
 ### Encode a multiple documents
 
