@@ -86,8 +86,8 @@ defmodule Ymlr.Encoder do
       {key, nil} -> encode_map_key(key)
       {key, value} when value == [] -> [encode_map_key(key), " []"]
       {key, value} when value == %{} -> [encode_map_key(key), " {}"]
-      {key, value} when is_map(value)  -> [encode_map_key(key) | [indentation | ["  " | encode_as_io_list(value, level + 1)]]]
-      {key, value} when is_list(value) -> [encode_map_key(key) | [indentation | ["  " | encode_as_io_list(value, level + 1)]]]
+      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
+      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
       {key, value} -> [encode_map_key(key), " " | encode_as_io_list(value, level + 1)]
     end)
     |> Enum.intersperse(indentation)
