@@ -106,11 +106,12 @@ defmodule Ymlr.EncoderTest do
 
     @tag skip: "not sure about those => review the spec"
     test "quoted strings - in map key (requires escape char)" do
-      assert MUT.to_s!(%{"a\nb" => "value"}) == ~s("a\nb": value)
       assert MUT.to_s!(%{"a\tb" => "value"}) == ~s("a\tb": value)
       assert MUT.to_s!(%{"a\rb" => "value"}) == ~s("a\rb": value)
-      assert MUT.to_s!(%{"a\r\nb" => "value"}) == ~s("a\r\nb": value)
-      assert MUT.to_s!(%{"a\n\tb" => "value"}) == ~s("a\n\tb": value)
+    end
+
+    test "newline in map key" do
+      assert MUT.to_s!(%{"a\nb" => "value"}) == ~S("a\nb": value)
     end
 
     test "integers" do

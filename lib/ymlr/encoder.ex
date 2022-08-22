@@ -165,7 +165,7 @@ defmodule Ymlr.Encoder do
   end
 
   # for example for map keys
-  defp multiline(data, nil), do: ~s("#{escape(data)}")
+  defp multiline(data, nil), do: inspect(data)
   # see https://yaml-multiline.info/
   defp multiline(data, level) do
     indentation = indent(level)
