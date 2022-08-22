@@ -8,11 +8,3 @@ updates:
       interval: "weekly"
     labels:
       - "dependabot-update"
-
-  - package-ecosystem: "mix"
-    directory: "/"
-    target-branch: "1.x"
-    schedule:
-      interval: "weekly"
-    labels:
-      - "dependabot-update"
