@@ -72,8 +72,8 @@ defmodule Ymlr.EncoderTest do
     end
 
     test "quoted strings - escape seq forces double quotes (tab char)" do
-      assert MUT.to_s!("a\tb") == ~S("a\tb")
-      assert MUT.to_s!("!a\tb") == ~S("!a\tb")
+      assert MUT.to_s!("a\tb") == ~s("a\tb")
+      assert MUT.to_s!("!a\tb") == ~s("!a\tb")
     end
 
     test "quoted strings - escape seq forces double quotes (cross mark)" do
