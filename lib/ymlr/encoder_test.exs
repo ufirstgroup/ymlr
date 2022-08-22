@@ -192,6 +192,17 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!("hello\nworld") == "|-\nhello\nworld"
       assert MUT.to_s!("hello\nworld\n") == "|\nhello\nworld"
     end
+    # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
+    test "multiline strings - mix spaces and tabs" do
+      given = "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"
+      expected = """
+                block: |
+                  void main() {
+                  \tprintf("Hello, world!\\n");
+                  }
+                """ |> String.trim()
+      assert MUT.to_s!(%{block: given}) == expected
+    end
     test "nested: list / multiline string" do
       assert MUT.to_s!(["a\nb\n", "c"]) == "- |\n  a\n  b\n- c"
     end
