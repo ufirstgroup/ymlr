@@ -60,10 +60,11 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!("#comment") == ~S('#comment')
       assert MUT.to_s!("|block_scalar") == ~S('|block_scalar')
       assert MUT.to_s!(">block_scalar") == ~S('>block_scalar')
-      assert MUT.to_s!("@reserved") == ~S('@reserved')
-      assert MUT.to_s!("`reserved") == ~S('`reserved')
       assert MUT.to_s!(~S("double_quote)) == ~S('"double_quote')
       assert MUT.to_s!(~S('single_quote)) == ~S("'single_quote")
+      # see also "reserved indicators - ..." tests
+      assert MUT.to_s!("@reserved") == ~S('@reserved')
+      assert MUT.to_s!("`reserved") == ~S('`reserved')
     end
 
     test "quoted strings - ends with colon" do
@@ -79,6 +80,16 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!("[{}]") == ~S('[{}]')
                # ... (use double quotes if string contains single quotes)
       assert MUT.to_s!(~S(["I don't know!\nRea|\y?"])) == ~S("[\"I don't know!\\nRea|\\y?\"]")
+    end
+
+    # see https://yaml.org/spec/1.2.2/#rule-c-reserved
+    test "reserved indicators - in map key" do
+      assert MUT.to_s!(%{"@key" => "value"}) == ~s('@key': value)
+      assert MUT.to_s!(%{"`key" => "value"}) == ~s('`key': value)
+    end
+    test "reserved indicators - in map value" do
+      assert MUT.to_s!(%{"key" => "@value"}) == ~s(key: '@value')
+      assert MUT.to_s!(%{"key" => "`value"}) == ~s(key: '`value')
     end
 
     test "integers" do
@@ -205,6 +216,7 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!(~U[2016-05-24 13:26:08.003Z])  == "2016-05-24T13:26:08.003Z"
       assert MUT.to_s!(~U[2016-05-24 13:26:08.0004Z]) == "2016-05-24T13:26:08.0004Z"
     end
+
   end
 
 end
