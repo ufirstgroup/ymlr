@@ -76,10 +76,6 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!("!a\tb") == ~s("!a\tb")
     end
 
-    test "quoted strings - escape seq forces double quotes (cross mark)" do
-      assert MUT.to_s!("\u274c") == ~S("\u274c")
-    end
-
     test "quoted strings - listy and mappy things" do
       # ... (prefer single quotes)
       assert MUT.to_s!("[]") == ~S('[]')
@@ -92,13 +88,29 @@ defmodule Ymlr.EncoderTest do
     end
 
     test "quoted strings - in map key" do
-      assert MUT.to_s!(%{"!key" => "value"}) == ~s('!key': value)
-      assert MUT.to_s!(%{"@key" => "value"}) == ~s('@key': value)
-      assert MUT.to_s!(%{"true" => "value"}) == ~s('true': value)
+      assert MUT.to_s!(%{"!key" => "value"}) == ~S('!key': value)
+      assert MUT.to_s!(%{"@key" => "value"}) == ~S('@key': value)
+      assert MUT.to_s!(%{"true" => "value"}) == ~S('true': value)
+    end
+
+    @tag skip: "not sure about those => to be reviewed"
+    # https://yaml.org/spec/1.2.2/#example-escaped-characters
+    test "quoted strings - example-escaped-characters from 1.2.2 spec" do
+      assert MUT.to_s!("Fun with \\") == ~S("Fun with \\")
+      assert MUT.to_s!("\" \u0007 \b \u001b \f") == ~S("\" \a \b \e \f")
+      # assert MUT.to_s!("\n \r \t \u000b \u0000") == ~S("\n \r \t \v \0")
+      # or we use | when string contains newlines => rewrite the example to:
+      assert MUT.to_s!("\r \t \u000b \u0000") == ~S("\r \t \v \0")
+      assert MUT.to_s!("\u0020 \u00a0 \u0085 \u2028 \u2029") == ~S("\  \_ \N \L \P")
+    end
+
+    @tag skip: "not sure about those => review the spec"
+    test "quoted strings - in map key (requires escape char)" do
       assert MUT.to_s!(%{"a\nb" => "value"}) == ~s("a\nb": value)
       assert MUT.to_s!(%{"a\tb" => "value"}) == ~s("a\tb": value)
+      assert MUT.to_s!(%{"a\rb" => "value"}) == ~s("a\rb": value)
+      assert MUT.to_s!(%{"a\r\nb" => "value"}) == ~s("a\r\nb": value)
       assert MUT.to_s!(%{"a\n\tb" => "value"}) == ~s("a\n\tb": value)
-      assert MUT.to_s!(%{"a\u274cb" => "value"}) == ~s("a\u274cb": value)
     end
 
     test "integers" do
