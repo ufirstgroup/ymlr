@@ -122,6 +122,12 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!(%{a: nil}) == "a:"
     end
 
+    test "invalid map key" do
+      assert_raise ArgumentError, fn ->
+        MUT.to_s!(%{%{a: 1} => 2})
+      end
+    end
+
     test "maps - string values" do
       assert MUT.to_s!(%{a: "a"}) == "a: a"
       assert MUT.to_s!(%{a: :b}) == "a: b"
