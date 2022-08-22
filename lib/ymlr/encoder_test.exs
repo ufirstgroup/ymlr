@@ -71,6 +71,15 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!("some:entry:") == ~S('some:entry:')
     end
 
+    test "quoted strings - escape seq forces double quotes (tab char)" do
+      assert MUT.to_s!("a\tb") == ~S("a\tb")
+      assert MUT.to_s!("!a\tb") == ~S("!a\tb")
+    end
+
+    test "quoted strings - escape seq forces double quotes (cross mark)" do
+      assert MUT.to_s!("\u274c") == ~S("\u274c")
+    end
+
     test "quoted strings - listy and mappy things" do
       # ... (prefer single quotes)
       assert MUT.to_s!("[]") == ~S('[]')
@@ -87,6 +96,9 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!(%{"@key" => "value"}) == ~s('@key': value)
       assert MUT.to_s!(%{"true" => "value"}) == ~s('true': value)
       assert MUT.to_s!(%{"a\nb" => "value"}) == ~s("a\nb": value)
+      assert MUT.to_s!(%{"a\tb" => "value"}) == ~s("a\tb": value)
+      assert MUT.to_s!(%{"a\n\tb" => "value"}) == ~s("a\n\tb": value)
+      assert MUT.to_s!(%{"a\u274cb" => "value"}) == ~s("a\u274cb": value)
     end
 
     test "integers" do
