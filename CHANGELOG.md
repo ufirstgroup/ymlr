@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+### Fixed
+
+- Wrap map keys in doouble quotes when required ([#94](https://github.com/ufirstgroup/ymlr/issues/94), [#95](https://github.com/ufirstgroup/ymlr/pull/95))
+
 ## [3.0.0] - 2022-08-07
 
 **In this release we changed the way `DateTime` is encoded (see below). This can be a breaking change if you rely on the old date format with spaces. Because of this change, version 3.0.0 is now again compatible with Elixir 1.10**

@@ -83,12 +83,12 @@ defmodule Ymlr.Encoder do
     indentation = indent(level)
     data
     |> Enum.map(fn
-      {key, nil} -> "#{key}:"
-      {key, value} when value == [] -> "#{key}: []"
-      {key, value} when value == %{} -> "#{key}: {}"
-      {key, value} when is_map(value)  -> ["#{key}:" | [indentation | ["  " | encode_as_io_list(value, level + 1)]]]
-      {key, value} when is_list(value) -> ["#{key}:" | [indentation | ["  " | encode_as_io_list(value, level + 1)]]]
-      {key, value} -> ["#{key}: " | encode_as_io_list(value, level + 1)]
+      {key, nil} -> encode_map_key(key)
+      {key, value} when value == [] -> [encode_map_key(key), " []"]
+      {key, value} when value == %{} -> [encode_map_key(key), " {}"]
+      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
+      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
+      {key, value} -> [encode_map_key(key), " " | encode_as_io_list(value, level + 1)]
     end)
     |> Enum.intersperse(indentation)
   end
@@ -105,7 +105,18 @@ defmodule Ymlr.Encoder do
   end
 
   defp encode_as_io_list(data, _) when is_atom(data), do: Atom.to_string(data)
-  defp encode_as_io_list(data, level) when is_binary(data) do
+  defp encode_as_io_list(data, level) when is_binary(data), do: encode_binary(data, level)
+
+  defp encode_as_io_list(data, _) when is_number(data), do: "#{data}"
+
+  defp encode_as_io_list(data, _), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML.")
+
+  defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ":"]
+  defp encode_map_key(data) when is_binary(data), do: [encode_binary(data, nil), ":"]
+  defp encode_map_key(data) when is_number(data), do: "#{data}:"
+  defp encode_map_key(data), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML (map key).")
+
+  defp encode_binary(data, level) do
     cond do
       data == "" -> ~S('')
       data == "null" -> ~S('null')
@@ -116,6 +127,7 @@ defmodule Ymlr.Encoder do
       data == "True" -> ~S('True')
       data == "False" -> ~S('False')
       String.contains?(data, "\n") -> multiline(data, level)
+      String.contains?(data, "\t") -> ~s("#{data}")
       String.at(data, 0) in @quote_when_first -> with_quotes(data)
       String.at(data, -1) in @quote_when_last -> with_quotes(data)
       String.starts_with?(data, "- ") -> with_quotes(data)
@@ -130,10 +142,6 @@ defmodule Ymlr.Encoder do
       true -> data
     end
   end
-
-  defp encode_as_io_list(data, _) when is_number(data), do: "#{data}"
-
-  defp encode_as_io_list(data, _), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML.")
 
   defp is_numeric(string) do
     case Float.parse(string) do
@@ -156,12 +164,15 @@ defmodule Ymlr.Encoder do
     data |> String.replace("\\", "\\\\") |> String.replace(~s("), ~s(\\"))
   end
 
+  # for example for map keys
+  defp multiline(data, nil), do: inspect(data)
   # see https://yaml-multiline.info/
   defp multiline(data, level) do
     indentation = indent(level)
     block = data |> String.trim_trailing("\n") |> String.replace("\n", IO.iodata_to_binary(indentation))
     [block_chomping_indicator(data) | [indentation | block]]
   end
+
   defp block_chomping_indicator(data) do
     if String.ends_with?(data, "\n"), do: "|", else: "|-"
   end
