@@ -151,7 +151,10 @@ defmodule Ymlr.Encoder do
       _ -> false
     end
   rescue
+    # Apparently not needed anymore since Elixir 1.14. Left in for bc but stop covering.
+    # coveralls-ignore-start
     _ -> false
+    # coveralls-ignore-stop
   end
 
   defp with_quotes(data) do
