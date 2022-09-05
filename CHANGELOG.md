@@ -10,12 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+<!--------------------- Don't add new entries after this line --------------------->
+
+## [3.0.1] - 2022-09-05
+
 ### Fixed
 
 - Wrap map keys in doouble quotes when required ([#94](https://github.com/ufirstgroup/ymlr/issues/94), [#95](https://github.com/ufirstgroup/ymlr/pull/95))
 - Encode structs by turning them to lists before mapping over them
-
-<!--------------------- Don't add new entries after this line --------------------->
 
 ## [3.0.0] - 2022-08-07
 
