@@ -82,6 +82,8 @@ defmodule Ymlr.Encoder do
   defp encode_as_io_list(data, level) when is_map(data) do
     indentation = indent(level)
     data
+    |> Map.to_list() # necessary for maps
+    |> Keyword.delete(:__struct__) # if it actually was a map
     |> Enum.map(fn
       {key, nil} -> encode_map_key(key)
       {key, value} when value == [] -> [encode_map_key(key), " []"]
@@ -149,7 +151,10 @@ defmodule Ymlr.Encoder do
       _ -> false
     end
   rescue
+    # Apparently not needed anymore since Elixir 1.14. Left in for bc but stop covering.
+    # coveralls-ignore-start
     _ -> false
+    # coveralls-ignore-stop
   end
 
   defp with_quotes(data) do

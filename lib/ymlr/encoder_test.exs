@@ -4,6 +4,10 @@ defmodule Ymlr.EncoderTest do
 
   alias Ymlr.Encoder, as: MUT
 
+  defmodule TestStruct do
+    defstruct [:foo, :bar]
+  end
+
   describe "to_s!/1" do
 
     test "atoms" do
@@ -158,6 +162,10 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!(%{a: :b}) == "a: b"
       assert MUT.to_s!(%{a: "true"}) == "a: 'true'"
       assert MUT.to_s!(%{a: "1"}) == "a: '1'"
+    end
+
+    test "structs" do
+      assert MUT.to_s!(%TestStruct{foo: 1, bar: 2}) == "bar: 2\nfoo: 1"
     end
 
     test "nested: list / list" do
