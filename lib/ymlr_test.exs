@@ -33,5 +33,30 @@ defmodule YmlrTest do
 
       assert MUT.document!(input) == output
     end
+
+    test "k8s resource with atoms options" do
+      {:ok, input} = YamlElixir.read_from_file("test_support/fixtures/iam_policy_atoms.yaml", atoms: true)
+
+      expected_output = """
+      ---
+      :apiVersion: iam.cnrm.cloud.google.com/v1beta1
+      :kind: :IAMPolicy
+      :metadata:
+        :annotations:
+          :cnrm.cloud.google.com/deletion-policy: abandon
+        :name: sa-testing-cc-iampolicy
+      :spec:
+        :bindings:
+          - :members:
+              - user:test@example.com
+            :role: roles/iam.serviceAccountUser
+        :resourceRef:
+          :apiVersion: iam.cnrm.cloud.google.com/v1beta1
+          :kind: :IAMServiceAccount
+          :name: testing-cc
+      """
+
+      assert MUT.document!(input, atoms: true) == expected_output
+    end
   end
 end

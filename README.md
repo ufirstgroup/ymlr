@@ -43,6 +43,14 @@ See The usage livebook `usage.livemd` for more detailed examples.
     a: 1
     """
 
+    iex> Ymlr.document!({"comment", %{a: 1, b: :c}}, atoms: true)
+    """
+    ---
+    # comment
+    :a: 1
+    :b: :c
+    """
+
     iex> Ymlr.document!({["comment 1", "comment 2"], %{"a" => "a", "b" => :b, "c" => "true", "d" => "100"}})
     """
     ---
@@ -67,3 +75,7 @@ See The usage livebook `usage.livemd` for more detailed examples.
     b: 2
     """
 ```
+
+### Options
+
+- `:atoms` - If `true` will encode values and keys.

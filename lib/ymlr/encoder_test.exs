@@ -258,6 +258,27 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!(~D[2016-05-24]) == "2016-05-24"
     end
 
+    test "atoms option" do
+      assert MUT.to_s!(:foo, atoms: true) == ":foo"
+      assert MUT.to_s!(%{"foo" => "bar", baz: :buzz}, atoms: true) == ":baz: :buzz\nfoo: bar"
+    end
+
+    test "nested: map / atoms option" do
+      expected = """
+                 :a: |-
+                   a1
+                   a2
+                 :b: b1
+                 :c: |
+                   c1
+                   c2
+                 :d: d1
+                 :e: :e1
+                 """ |> String.trim()
+
+      assert MUT.to_s!(%{a: "a1\na2", b: "b1", c: "c1\nc2\n", d: "d1", e: :e1}, atoms: true) == expected
+    end
+
     test "datetime" do
       assert MUT.to_s!(~U[2016-05-24 13:26:08Z])      == "2016-05-24T13:26:08Z"
       assert MUT.to_s!(~U[2016-05-24 13:26:08.1Z])    == "2016-05-24T13:26:08.1Z"

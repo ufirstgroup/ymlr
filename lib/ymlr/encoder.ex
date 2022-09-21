@@ -27,6 +27,10 @@ defmodule Ymlr.Encoder do
   @doc """
   Encodes the given data as YAML string. Raises if it cannot be encoded.
 
+  ## Options
+
+  - `:atoms` - If `true` will encode values and keys.
+
   ## Examples
 
       iex> Ymlr.Encoder.to_s!(%{})
@@ -35,90 +39,102 @@ defmodule Ymlr.Encoder do
       iex> Ymlr.Encoder.to_s!(%{a: 1, b: 2})
       "a: 1\\nb: 2"
 
+      iex> Ymlr.Encoder.to_s!(%{a: 1, b: :c}, atoms: true)
+      ":a: 1\\n:b: :c"
+
       iex> Ymlr.Encoder.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
       "a: a\\nb: b\\nc: 'true'\\nd: '100'"
 
       iex> Ymlr.Encoder.to_s!({"a", "b"})
       ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
   """
-  @spec to_s!(data) :: binary()
-  def to_s!(data) do
+  @spec to_s!(data, keyword()) :: binary()
+  def to_s!(data, opts \\ []) do
     data
-    |> encode_as_io_list()
+    |> encode_as_io_list(0, Enum.into(opts, %{atoms: false}))
     |> IO.iodata_to_binary()
   end
 
   @doc """
   Encodes the given data as YAML string.
 
+  ## Options
+
+  - `:atoms` - If `true` will encode values and keys.
+
   ## Examples
 
       iex> Ymlr.Encoder.to_s(%{a: 1, b: 2})
       {:ok, "a: 1\\nb: 2"}
 
+      iex> Ymlr.Encoder.to_s(%{a: 1, b: :c}, atoms: true)
+      {:ok, ":a: 1\\n:b: :c"}
+
       iex> Ymlr.Encoder.to_s({"a", "b"})
       {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
   """
-  @spec to_s(data) :: {:ok, binary()} | {:error, binary()}
-  def to_s(data) do
-    yml = to_s!(data)
+  @spec to_s(data, keyword()) :: {:ok, binary()} | {:error, binary()}
+  def to_s(data, opts \\ []) do
+    yml = to_s!(data, Enum.into(opts, %{atoms: false}))
     {:ok, yml}
   rescue
     e in ArgumentError -> {:error, e.message}
   end
 
-  defp encode_as_io_list(data, level \\ 0)
-
-  defp encode_as_io_list(data, _level) when data == %{} do
+  defp encode_as_io_list(data, _level, _opts) when data == %{} do
     "{}"
   end
 
-  defp encode_as_io_list(%Date{} = data, _), do: Date.to_iso8601(data)
+  defp encode_as_io_list(%Date{} = data, _, _), do: Date.to_iso8601(data)
 
-  defp encode_as_io_list(%DateTime{} = data, _) do
+  defp encode_as_io_list(%DateTime{} = data, _, _) do
     data |> DateTime.shift_zone!("Etc/UTC") |> DateTime.to_iso8601()
   end
 
-  defp encode_as_io_list(data, level) when is_map(data) do
+  defp encode_as_io_list(data, level, opts) when is_map(data) do
     indentation = indent(level)
     data
     |> Map.to_list() # necessary for maps
     |> Keyword.delete(:__struct__) # if it actually was a map
     |> Enum.map(fn
-      {key, nil} -> encode_map_key(key)
-      {key, value} when value == [] -> [encode_map_key(key), " []"]
-      {key, value} when value == %{} -> [encode_map_key(key), " {}"]
-      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
-      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
-      {key, value} -> [encode_map_key(key), " " | encode_as_io_list(value, level + 1)]
+      {key, nil} -> encode_map_key(key, opts)
+      {key, value} when value == [] -> [encode_map_key(key, opts), " []"]
+      {key, value} when value == %{} -> [encode_map_key(key, opts), " {}"]
+      {key, value} when is_map(value) ->
+        [encode_map_key(key, opts), indentation, "  " | encode_as_io_list(value, level + 1, opts)]
+      {key, value} when is_list(value) ->
+        [encode_map_key(key, opts), indentation, "  " | encode_as_io_list(value, level + 1, opts)]
+      {key, value} -> [encode_map_key(key, opts), " " | encode_as_io_list(value, level + 1, opts)]
     end)
     |> Enum.intersperse(indentation)
   end
 
-  defp encode_as_io_list(data, level) when is_list(data) do
+  defp encode_as_io_list(data, level, opts) when is_list(data) do
     indentation = indent(level)
     data
     |> Enum.map(fn
       nil -> "-"
       "" -> ~s(- "")
-      value -> ["- " | encode_as_io_list(value, level + 1)]
+      value -> ["- " | encode_as_io_list(value, level + 1, opts)]
     end)
     |> Enum.intersperse(indentation)
   end
 
-  defp encode_as_io_list(data, _) when is_atom(data), do: Atom.to_string(data)
-  defp encode_as_io_list(data, level) when is_binary(data), do: encode_binary(data, level)
+  defp encode_as_io_list(data, _, %{atoms: true}) when is_atom(data), do: [":", Atom.to_string(data)]
+  defp encode_as_io_list(data, _, _) when is_atom(data), do: Atom.to_string(data)
+  defp encode_as_io_list(data, level, opts) when is_binary(data), do: encode_binary(data, level, opts)
 
-  defp encode_as_io_list(data, _) when is_number(data), do: "#{data}"
+  defp encode_as_io_list(data, _, _) when is_number(data), do: "#{data}"
 
-  defp encode_as_io_list(data, _), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML.")
+  defp encode_as_io_list(data, _, _), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML.")
 
-  defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ":"]
-  defp encode_map_key(data) when is_binary(data), do: [encode_binary(data, nil), ":"]
-  defp encode_map_key(data) when is_number(data), do: "#{data}:"
-  defp encode_map_key(data), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML (map key).")
+  defp encode_map_key(data, %{atoms: true}) when is_atom(data), do: [":", Atom.to_string(data), ":"]
+  defp encode_map_key(data, _opts) when is_atom(data), do: [Atom.to_string(data), ":"]
+  defp encode_map_key(data, opts) when is_binary(data), do: [encode_binary(data, nil, opts), ":"]
+  defp encode_map_key(data, _opts) when is_number(data), do: "#{data}:"
+  defp encode_map_key(data, _opts), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML (map key).")
 
-  defp encode_binary(data, level) do
+  defp encode_binary(data, level, _opts) do
     cond do
       data == "" -> ~S('')
       data == "null" -> ~S('null')
