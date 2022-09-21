@@ -30,8 +30,9 @@ k8s-*.tar
 /priv/plts/*.plt
 /priv/plts/*.plt.hash
 
-# Idea files
+# Editor files
 /.idea
+/.vscode
 
 .direnv
 .env
