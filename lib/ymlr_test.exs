@@ -10,9 +10,7 @@ defmodule YmlrTest do
     end
 
     test "k8s resource" do
-      {:ok, input} = YamlElixir.read_from_file("test_support/fixtures/iam_policy.yaml")
-
-      output = """
+      expected_output = """
       ---
       apiVersion: iam.cnrm.cloud.google.com/v1beta1
       kind: IAMPolicy
@@ -31,12 +29,14 @@ defmodule YmlrTest do
           name: testing-cc
       """
 
-      assert MUT.document!(input) == output
+      input = YamlElixir.read_from_file!("test_support/fixtures/iam_policy.yaml")
+      output = MUT.document!(input)
+
+      assert output == expected_output
+      assert YamlElixir.read_from_string!(output) |> MUT.document!() == output
     end
 
     test "k8s resource with atoms options" do
-      {:ok, input} = YamlElixir.read_from_file("test_support/fixtures/iam_policy_atoms.yaml", atoms: true)
-
       expected_output = """
       ---
       :apiVersion: iam.cnrm.cloud.google.com/v1beta1
@@ -56,7 +56,11 @@ defmodule YmlrTest do
           :name: testing-cc
       """
 
-      assert MUT.document!(input, atoms: true) == expected_output
+      input = YamlElixir.read_from_file!("test_support/fixtures/iam_policy_atoms.yaml", atoms: true)
+      output = MUT.document!(input, atoms: true)
+
+      assert output == expected_output
+      assert YamlElixir.read_from_string!(output, atoms: true) |> MUT.document!(atoms: true) == output
     end
   end
 end
