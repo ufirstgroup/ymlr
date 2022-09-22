@@ -75,7 +75,7 @@ defmodule Ymlr.Encoder do
   """
   @spec to_s(data, keyword()) :: {:ok, binary()} | {:error, binary()}
   def to_s(data, opts \\ []) do
-    yml = to_s!(data, Enum.into(opts, %{atoms: false}))
+    yml = to_s!(data, opts)
     {:ok, yml}
   rescue
     e in ArgumentError -> {:error, e.message}
