@@ -84,14 +84,7 @@ defmodule Ymlr.Encoder do
     data
     |> Map.to_list() # necessary for maps
     |> Keyword.delete(:__struct__) # if it actually was a map
-    |> Enum.map(fn
-      {key, nil} -> encode_map_key(key)
-      {key, value} when value == [] -> [encode_map_key(key), " []"]
-      {key, value} when value == %{} -> [encode_map_key(key), " {}"]
-      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
-      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
-      {key, value} -> [encode_map_key(key), " " | encode_as_io_list(value, level + 1)]
-    end)
+    |> Enum.map(&encode_kv_pair(&1, level, indentation))
     |> Enum.intersperse(indentation)
   end
 
@@ -101,6 +94,7 @@ defmodule Ymlr.Encoder do
     |> Enum.map(fn
       nil -> "-"
       "" -> ~s(- "")
+      {k, _v} = kv_pair when is_atom(k) -> encode_kv_pair(kv_pair, level, indentation)
       value -> ["- " | encode_as_io_list(value, level + 1)]
     end)
     |> Enum.intersperse(indentation)
@@ -142,6 +136,17 @@ defmodule Ymlr.Encoder do
       String.starts_with?(data, "0x") -> with_quotes(data)
       is_numeric(data) -> with_quotes(data)
       true -> data
+    end
+  end
+
+  defp encode_kv_pair(pair, level, indentation) do
+    case pair do
+      {key, nil} -> encode_map_key(key)
+      {key, value} when value == [] -> [encode_map_key(key), " []"]
+      {key, value} when value == %{} -> [encode_map_key(key), " {}"]
+      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
+      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
+      {key, value} -> [encode_map_key(key), " " | encode_as_io_list(value, level + 1)]
     end
   end
 

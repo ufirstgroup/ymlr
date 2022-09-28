@@ -168,6 +168,18 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!(%TestStruct{foo: 1, bar: 2}) == "bar: 2\nfoo: 1"
     end
 
+    test "keyword lists" do
+      assert MUT.to_s!([a: 1]) == "a: 1"
+      assert MUT.to_s!([a: 1, b: 2]) == "a: 1\nb: 2"
+      assert MUT.to_s!([a: nil]) == "a:"
+    end
+    
+    test "invalid keyword key" do
+      assert_raise ArgumentError, fn ->
+        MUT.to_s!([{"a", 1}])
+      end
+    end
+    
     test "nested: list / list" do
       assert MUT.to_s!([[1, 2], [3, 4]]) == "- - 1\n  - 2\n- - 3\n  - 4"
     end

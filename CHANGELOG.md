@@ -8,7 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- Add your changelog entry to the relevant subsection -->
 
-<!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
+### Added
+- Keyword list support
 
 <!--------------------- Don't add new entries after this line --------------------->
 
