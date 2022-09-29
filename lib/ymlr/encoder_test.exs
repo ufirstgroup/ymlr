@@ -168,6 +168,16 @@ defmodule Ymlr.EncoderTest do
       assert MUT.to_s!(%TestStruct{foo: 1, bar: 2}) == "bar: 2\nfoo: 1"
     end
 
+    test "tuples - not supported" do
+      assert {:error, error} = MUT.to_s({"a", "b"})
+      assert is_binary(error)
+    end
+
+    test "tuples (nested) - not supported" do
+      assert {:error, error} = MUT.to_s([{"a", "b"}])
+      assert is_binary(error)
+    end
+
     test "nested: list / list" do
       assert MUT.to_s!([[1, 2], [3, 4]]) == "- - 1\n  - 2\n- - 3\n  - 4"
     end
