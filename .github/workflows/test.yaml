@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Test - OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
     strategy:
       # see https://hexdocs.pm/elixir/1.14.0-rc.0/compatibility-and-deprecations.html#compatibility-between-elixir-and-erlang-otp
