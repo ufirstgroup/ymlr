@@ -17,7 +17,6 @@ defmodule Ymlr.MixProject do
       test_coverage: [
         tool: ExCoveralls
       ],
-      test_paths: ["lib"],
       docs: [
         main: "readme",
         extras: ["README.md", "usage.livemd", "CHANGELOG.md"],

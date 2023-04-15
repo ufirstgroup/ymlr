@@ -1,4 +1,4 @@
-name: mix test for [version matrix]
+name: Elixir Compatibility Matrix
 
 on:
   push:
