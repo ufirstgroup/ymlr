@@ -2,14 +2,16 @@
 
 ymlr - A YAML encoder for Elixir.
 
-[![Build Status](https://github.com/ufirstgroup/ymlr/workflows/CI/badge.svg)](https://github.com/ufirstgroup/ymlr/actions?query=workflow%3ACI)
-[![codecov](https://codecov.io/gh/ufirstgroup/ymlr/branch/master/graph/badge.svg?token=DSLGDW6KS9)](https://codecov.io/gh/ufirstgroup/ymlr)
+[![Module Version](https://img.shields.io/hexpm/v/ymlr.svg)](https://hex.pm/packages/ymlr)
+[![Coverage Status](https://coveralls.io/repos/github/ufirstgroup/ymlr/badge.svg?branch=main)](https://coveralls.io/github/ufirstgroup/ymlr?branch=main)
+[![Last Updated](https://img.shields.io/github/last-commit/ufirstgroup/ymlr.svg)](https://github.com/ufirstgroup/ymlr/commits/main)
 
-[![Hex.pm](http://img.shields.io/hexpm/v/ymlr.svg?style=flat)](https://hex.pm/packages/ymlr)
+[![Build Status Code Qualits](https://github.com/ufirstgroup/ymlr/actions/workflows/code_quality.yaml/badge.svg)](https://github.com/ufirstgroup/ymlr/actions/workflows/code_quality.yaml)
+[![Build Status Elixir](https://github.com/ufirstgroup/ymlr/actions/workflows/elixir_matrix.yaml/badge.svg)](https://github.com/ufirstgroup/ymlr/actions/workflows/elixir_matrix.yaml)
+
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/ymlr/)
 [![Total Download](https://img.shields.io/hexpm/dt/ymlr.svg)](https://hex.pm/packages/ymlr)
-
-[![Documentation](https://img.shields.io/badge/documentation-on%20hexdocs-green.svg)](https://hexdocs.pm/ymlr/)
-![Hex.pm](https://img.shields.io/hexpm/l/ymlr.svg?style=flat)
+[![License](https://img.shields.io/hexpm/l/ymlr.svg)](https://github.com/ufirstgroup/ymlr/blob/main/LICENSE)
 
 ## Installation
 
