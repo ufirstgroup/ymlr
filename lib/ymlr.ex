@@ -8,7 +8,7 @@ defmodule Ymlr do
 
   @type document :: Encode.data | {binary(), Encode.data} | {[binary()], Encode.data}
 
-  @doc """
+  @doc ~S"""
   Encodes a given data as YAML document with a separator ("---") at the beginning. Raises if it cannot be encoded.
 
   Optinally you can pass a tuple with comment(s) and data as first argument.
@@ -16,16 +16,13 @@ defmodule Ymlr do
   ## Examples
 
       iex> Ymlr.document!(%{a: 1})
-      "---\\na: 1\\n"
+      "---\na: 1\n"
 
       iex> Ymlr.document!({"comment", %{a: 1}})
-      "---\\n# comment\\na: 1\\n"
+      "---\n# comment\na: 1\n"
 
       iex> Ymlr.document!({["comment 1", "comment 2"], %{a: 1}})
-      "---\\n# comment 1\\n# comment 2\\na: 1\\n"
-
-      iex> Ymlr.document!({[], {"a", "b"}})
-      ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
+      "---\n# comment 1\n# comment 2\na: 1\n"
   """
   @spec document!(document) :: binary()
   def document!(document)
@@ -39,7 +36,7 @@ defmodule Ymlr do
     document!({[], data})
   end
 
-  @doc """
+  @doc ~S"""
   Encodes a given data as YAML document with a separator ("---") at the beginning.
 
   Optinally you can pass a tuple with comment(s) and data as first argument.
@@ -47,38 +44,32 @@ defmodule Ymlr do
   ## Examples
 
       iex> Ymlr.document(%{a: 1})
-      {:ok, "---\\na: 1\\n"}
+      {:ok, "---\na: 1\n"}
 
       iex> Ymlr.document({"comment", %{a: 1}})
-      {:ok, "---\\n# comment\\na: 1\\n"}
+      {:ok, "---\n# comment\na: 1\n"}
 
       iex> Ymlr.document({["comment 1", "comment 2"], %{a: 1}})
-      {:ok, "---\\n# comment 1\\n# comment 2\\na: 1\\n"}
-
-      iex> Ymlr.document({[], {"a", "b"}})
-      {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
+      {:ok, "---\n# comment 1\n# comment 2\na: 1\n"}
   """
   @spec document(document) :: {:ok, binary()} | {:error, binary()}
   def document(document) do
     yml = document!(document)
     {:ok, yml}
   rescue
-    e in ArgumentError -> {:error, e.message}
+    e in Protocol.UndefinedError -> {:error, Exception.message(e)}
   end
 
-  @doc """
+  @doc ~S"""
   Encodes a given list of data as "---" separated YAML documents. Raises if it cannot be encoded.
 
   ## Examples
 
       iex> Ymlr.documents!([%{a: 1}])
-      "---\\na: 1\\n"
+      "---\na: 1\n"
 
       iex> Ymlr.documents!([%{a: 1}, %{b: 2}])
-      "---\\na: 1\\n\\n---\\nb: 2\\n"
-
-      iex> Ymlr.documents!([{[], {"a", "b"}}])
-      ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
+      "---\na: 1\n\n---\nb: 2\n"
 
       iex> Ymlr.documents!(%{a: "a"})
       ** (ArgumentError) The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document.
@@ -87,19 +78,16 @@ defmodule Ymlr do
   def documents!(_documents), do:
     raise(ArgumentError, "The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document.")
 
-  @doc """
+  @doc ~S"""
   Encodes a given list of data as "---" separated YAML documents.
 
   ## Examples
 
       iex> Ymlr.documents([%{a: 1}])
-      {:ok, "---\\na: 1\\n"}
+      {:ok, "---\na: 1\n"}
 
       iex> Ymlr.documents([%{a: 1}, %{b: 2}])
-      {:ok, "---\\na: 1\\n\\n---\\nb: 2\\n"}
-
-      iex> Ymlr.documents([{[], {"a", "b"}}])
-      {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
+      {:ok, "---\na: 1\n\n---\nb: 2\n"}
 
       iex> Ymlr.documents(%{a: "a"})
       {:error, "The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document."}
@@ -109,7 +97,9 @@ defmodule Ymlr do
     yml = documents!(documents)
     {:ok, yml}
   rescue
+    e in Protocol.UndefinedError ->
+      {:error, Exception.message(e)}
     e in ArgumentError ->
-      {:error, e.message}
+      {:error, Exception.message(e)}
   end
 end

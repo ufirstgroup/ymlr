@@ -4,10 +4,6 @@ defmodule Ymlr.EncodeTest do
 
   alias Ymlr.Encode, as: MUT
 
-  defmodule TestStruct do
-    defstruct [:foo, :bar]
-  end
-
   describe "to_s!/1" do
 
     test "atoms" do
@@ -97,6 +93,12 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!(%{"true" => "value"}) == ~S('true': value)
     end
 
+    test "bitstrings" do
+      assert_raise Protocol.UndefinedError, ~r/cannot encode a bitstring to YAML/, fn ->
+        MUT.to_s!(<< 3::4 >>)
+      end
+    end
+
     @tag skip: "not sure about those => to be reviewed"
     # https://yaml.org/spec/1.2.2/#example-escaped-characters
     test "quoted strings - example-escaped-characters from 1.2.2 spec" do
@@ -124,6 +126,10 @@ defmodule Ymlr.EncodeTest do
 
     test "floats" do
       assert MUT.to_s!(1.2) == "1.2"
+    end
+
+    test "decimals" do
+      assert MUT.to_s!(Decimal.new("1.2")) == "1.2"
     end
 
     test "hex and oversize float" do
@@ -165,7 +171,12 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "structs" do
-      assert MUT.to_s!(%TestStruct{foo: 1, bar: 2}) == "bar: 2\nfoo: 1"
+      assert_raise Protocol.UndefinedError,
+        ~r/protocol Ymlr.Encoder not implemented/,
+        fn -> MUT.to_s!(%TestStruct{foo: 1, bar: 2}) end
+      assert "bar: 2\nfoo: 1" == MUT.to_s!(%TestStructDerivedAll{foo: 1, bar: 2})
+      assert "foo: 1" == MUT.to_s!(%TestStructDerivedOnlyFoo{foo: 1, bar: 2})
+      assert "bar: 2" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
     end
 
     test "tuples - not supported" do

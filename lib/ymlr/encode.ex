@@ -3,6 +3,8 @@ defmodule Ymlr.Encode do
   Encodes data into YAML strings.
   """
 
+  alias Ymlr.Encoder
+
   # credo:disable-for-this-file Credo.Check.Refactor.CyclomaticComplexity
 
   @type data :: map() | [data] | atom() | binary() | number()
@@ -37,81 +39,63 @@ defmodule Ymlr.Encode do
 
       iex> Ymlr.Encode.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
       "a: a\\nb: b\\nc: 'true'\\nd: '100'"
-
-      iex> Ymlr.Encode.to_s!({"a", "b"})
-      ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
   """
   @spec to_s!(data) :: binary()
   def to_s!(data) do
     data
-    |> encode_as_io_list()
+    |> Ymlr.Encoder.encode()
     |> IO.iodata_to_binary()
   end
 
-  @doc """
+  @doc ~S"""
   Encodes the given data as YAML string.
 
   ## Examples
 
       iex> Ymlr.Encode.to_s(%{a: 1, b: 2})
-      {:ok, "a: 1\\nb: 2"}
-
-      iex> Ymlr.Encode.to_s({"a", "b"})
-      {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
+      {:ok, "a: 1\nb: 2"}
   """
   @spec to_s(data) :: {:ok, binary()} | {:error, binary()}
   def to_s(data) do
     yml = to_s!(data)
     {:ok, yml}
   rescue
-    e in ArgumentError -> {:error, e.message}
+    e in Protocol.UndefinedError -> {:error, Exception.message(e)}
   end
 
-  defp encode_as_io_list(data, level \\ 0)
+  def map(data, _level) when data == %{}, do: "{}"
 
-  defp encode_as_io_list(data, _level) when data == %{} do
-    "{}"
-  end
-
-  defp encode_as_io_list(%Date{} = data, _), do: Date.to_iso8601(data)
-
-  defp encode_as_io_list(%DateTime{} = data, _) do
-    data |> DateTime.shift_zone!("Etc/UTC") |> DateTime.to_iso8601()
-  end
-
-  defp encode_as_io_list(data, level) when is_map(data) do
+  def map(data, level) when is_map(data) do
     indentation = indent(level)
     data
     |> Map.to_list() # necessary for maps
-    |> Keyword.delete(:__struct__) # if it actually was a map
     |> Enum.map(fn
       {key, nil} -> encode_map_key(key)
       {key, value} when value == [] -> [encode_map_key(key), " []"]
       {key, value} when value == %{} -> [encode_map_key(key), " {}"]
-      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
-      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
-      {key, value} -> [encode_map_key(key), " " | encode_as_io_list(value, level + 1)]
+      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | Encoder.encode(value, level + 1)]
+      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | Encoder.encode(value, level + 1)]
+      {key, value} -> [encode_map_key(key), " " | Encoder.encode(value, level + 1)]
     end)
     |> Enum.intersperse(indentation)
   end
 
-  defp encode_as_io_list(data, level) when is_list(data) do
+  def list(data, level) do
     indentation = indent(level)
     data
     |> Enum.map(fn
       nil -> "-"
       "" -> ~s(- "")
-      value -> ["- " | encode_as_io_list(value, level + 1)]
+      value -> ["- " | Encoder.encode(value, level + 1)]
     end)
     |> Enum.intersperse(indentation)
   end
 
-  defp encode_as_io_list(data, _) when is_atom(data), do: Atom.to_string(data)
-  defp encode_as_io_list(data, level) when is_binary(data), do: encode_binary(data, level)
+  def atom(data, _), do: Atom.to_string(data)
 
-  defp encode_as_io_list(data, _) when is_number(data), do: "#{data}"
+  def string(data, level), do: encode_binary(data, level)
 
-  defp encode_as_io_list(data, _), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML.")
+  def number(data, _), do: "#{data}"
 
   defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ":"]
   defp encode_map_key(data) when is_binary(data), do: [encode_binary(data, nil), ":"]

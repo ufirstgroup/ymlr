@@ -33,5 +33,18 @@ defmodule YmlrTest do
 
       assert MUT.document!(input) == output
     end
+
+    test "raises if not implemented" do
+      assert_raise Protocol.UndefinedError,
+        ~r/protocol Ymlr.Encoder not implemented/,
+        fn -> MUT.document!({[], {"a", "b"}}) end
+      assert_raise Protocol.UndefinedError,
+        ~r/protocol Ymlr.Encoder not implemented/,
+        fn -> MUT.documents!([{[], {"a", "b"}}]) end
+      assert {:error, error} = MUT.document({[], {"a", "b"}})
+      assert error =~ "protocol Ymlr.Encoder not implemented"
+      assert {:error, error} = MUT.documents([{[], {"a", "b"}}])
+      assert error =~ "protocol Ymlr.Encoder not implemented"
+    end
   end
 end
