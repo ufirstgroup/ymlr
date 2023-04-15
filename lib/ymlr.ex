@@ -1,12 +1,12 @@
 defmodule Ymlr do
   @moduledoc """
-  Encodes data into YAML documents using the `Ymlr.Encoder`.
+  Encodes data into YAML documents using the `Ymlr.Encode`.
   Every document starts with a separator ("---") and can be enhanced with comments.
   """
 
-  alias Ymlr.Encoder
+  alias Ymlr.Encode
 
-  @type document :: Encoder.data | {binary(), Encoder.data} | {[binary()], Encoder.data}
+  @type document :: Encode.data | {binary(), Encode.data} | {[binary()], Encode.data}
 
   @doc """
   Encodes a given data as YAML document with a separator ("---") at the beginning. Raises if it cannot be encoded.
@@ -31,7 +31,7 @@ defmodule Ymlr do
   def document!(document)
   def document!({lines, data}) when is_list(lines) do
     comments = Enum.map_join(lines, "", &("# #{&1}\n"))
-    "---\n" <> comments <> Encoder.to_s!(data) <> "\n"
+    "---\n" <> comments <> Encode.to_s!(data) <> "\n"
   end
   def document!({comment, data}), do: document!({[comment], data})
 

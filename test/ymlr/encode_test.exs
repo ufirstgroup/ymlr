@@ -1,8 +1,8 @@
-defmodule Ymlr.EncoderTest do
+defmodule Ymlr.EncodeTest do
   use ExUnit.Case
-  doctest Ymlr.Encoder
+  doctest Ymlr.Encode
 
-  alias Ymlr.Encoder, as: MUT
+  alias Ymlr.Encode, as: MUT
 
   defmodule TestStruct do
     defstruct [:foo, :bar]
