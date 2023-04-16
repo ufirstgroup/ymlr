@@ -20,7 +20,7 @@ The package can be installed by adding `ymlr` to your list of dependencies in `m
 ```elixir
 def deps do
   [
-    {:ymlr, "~> 3.0"}
+    {:ymlr, "~> 4.0"}
   ]
 end
 ```
