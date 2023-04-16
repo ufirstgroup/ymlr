@@ -3,7 +3,7 @@
 # Usage
 
 ```elixir
-Mix.install([:kino, :ymlr])
+Mix.install([:kino, :ymlr, :yaml_elixir])
 
 full = %{
   "atom" => :ymlr,
@@ -33,13 +33,46 @@ full = %{
 }
 
 simple_1 = %{"message" => "hello world"}
-simple_2 = %{"message" => "nice to be here"}
+simple_2 = %{message: "nice to be here"}
+:ok
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{"message" => "nice to be here"}
+Resolving Hex dependencies...
+Dependency resolution completed:
+New:
+  kino 0.9.2
+  table 0.1.2
+  yamerl 0.10.0
+  yaml_elixir 2.9.0
+  ymlr 3.0.1
+* Getting kino (Hex package)
+* Getting ymlr (Hex package)
+* Getting yaml_elixir (Hex package)
+* Getting yamerl (Hex package)
+* Getting table (Hex package)
+==> table
+Compiling 5 files (.ex)
+Generated table app
+==> ymlr
+Compiling 2 files (.ex)
+Generated ymlr app
+==> kino
+Compiling 39 files (.ex)
+Generated kino app
+===> Analyzing applications...
+===> Compiling yamerl
+==> yaml_elixir
+Compiling 6 files (.ex)
+Generated yaml_elixir app
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
 ```
 
 ## Encoding a single document
@@ -62,7 +95,7 @@ atom: ymlr
 date:
   2018-11-15
 date_time:
-  2018-11-15 11:00:00.000000000 Z
+  2018-11-15T11:00:00Z
 list:
   - item 1
   - item 2
@@ -236,4 +269,24 @@ message: nice to be here
 
 ```
 :ok
+```
+
+## Encoding Atom Map Keys
+
+By default, atoms as map keys are encoded as strings (without the leading
+colon). If you want atoms to be encoded with a leading colon in order to be able
+to parse it later using [`YamlElixir`'s `atoms`
+option](https://hexdocs.pm/yaml_elixir/readme.html#support-for-atoms), you can
+pass `atoms: true` as second argument to any of the `Ymlr` module's functions:
+
+```elixir
+simple_2
+|> Ymlr.document!(atoms: true)
+|> YamlElixir.read_from_string!(atoms: true)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{message: "nice to be here"}
 ```
