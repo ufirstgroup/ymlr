@@ -5,7 +5,6 @@ defmodule Ymlr.EncodeTest do
   alias Ymlr.Encode, as: MUT
 
   describe "to_s!/1" do
-
     test "atoms" do
       assert MUT.to_s!(:a) == "a"
     end
@@ -56,7 +55,10 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!("}flow_mapping") == ~S('}flow_mapping')
       assert MUT.to_s!("[sequence_mapping") == ~S('[sequence_mapping')
       assert MUT.to_s!("]sequence_mapping") == ~S(']sequence_mapping')
-      assert MUT.to_s!(",flow_collection_entry_separator") == ~S(',flow_collection_entry_separator')
+
+      assert MUT.to_s!(",flow_collection_entry_separator") ==
+               ~S(',flow_collection_entry_separator')
+
       assert MUT.to_s!("#comment") == ~S('#comment')
       assert MUT.to_s!("|block_scalar") == ~S('|block_scalar')
       assert MUT.to_s!(">block_scalar") == ~S('>block_scalar')
@@ -95,7 +97,7 @@ defmodule Ymlr.EncodeTest do
 
     test "bitstrings" do
       assert_raise Protocol.UndefinedError, ~r/cannot encode a bitstring to YAML/, fn ->
-        MUT.to_s!(<< 3::4 >>)
+        MUT.to_s!(<<3::4>>)
       end
     end
 
@@ -133,7 +135,9 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "hex and oversize float" do
-      assert MUT.to_s!("7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718") == "7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718"
+      assert MUT.to_s!("7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718") ==
+               "7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718"
+
       assert MUT.to_s!("1.7976931348623157e+309") == "1.7976931348623157e+309"
     end
 
@@ -181,8 +185,9 @@ defmodule Ymlr.EncodeTest do
 
     test "structs" do
       assert_raise Protocol.UndefinedError,
-        ~r/protocol Ymlr.Encoder not implemented/,
-        fn -> MUT.to_s!(%TestStruct{foo: 1, bar: 2}) end
+                   ~r/protocol Ymlr.Encoder not implemented/,
+                   fn -> MUT.to_s!(%TestStruct{foo: 1, bar: 2}) end
+
       assert "bar: 2\nfoo: 1" == MUT.to_s!(%TestStructDerivedAll{foo: 1, bar: 2})
       assert "foo: 1" == MUT.to_s!(%TestStructDerivedOnlyFoo{foo: 1, bar: 2})
       assert "bar: 2" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
@@ -211,44 +216,52 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "nested: map / list" do
-      expected = """
-                 a:
-                   - 1
-                   - 2
-                 b:
-                   - 3
-                   - 4
-                 """ |> String.trim()
+      expected =
+        """
+        a:
+          - 1
+          - 2
+        b:
+          - 3
+          - 4
+        """
+        |> String.trim()
 
       assert MUT.to_s!(%{a: [1, 2], b: [3, 4]}) == expected
     end
 
     test "nested: map / empty list" do
-      expected = """
-                 a: []
-                 """ |> String.trim()
+      expected =
+        """
+        a: []
+        """
+        |> String.trim()
 
       assert MUT.to_s!(%{a: []}) == expected
     end
 
     test "nested: map / empty map" do
-      expected = """
-                 a: {}
-                 """ |> String.trim()
+      expected =
+        """
+        a: {}
+        """
+        |> String.trim()
 
       assert MUT.to_s!(%{a: %{}}) == expected
     end
 
     test "nested: map / map" do
-      expected = """
-                 a:
-                   b: 1
-                   c:
-                     d: 2
-                 e:
-                   f: 3
-                   g: 4
-                 """ |> String.trim()
+      expected =
+        """
+        a:
+          b: 1
+          c:
+            d: 2
+        e:
+          f: 3
+          g: 4
+        """
+        |> String.trim()
 
       assert MUT.to_s!(%{a: %{b: 1, c: %{d: 2}}, e: %{f: 3, g: 4}}) == expected
     end
@@ -258,31 +271,40 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!("hello\nworld") == "|-\nhello\nworld"
       assert MUT.to_s!("hello\nworld\n") == "|\nhello\nworld"
     end
+
     # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
     test "multiline strings - mix spaces and tabs" do
       given = "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"
-      expected = """
-                block: |
-                  void main() {
-                  \tprintf("Hello, world!\\n");
-                  }
-                """ |> String.trim()
+
+      expected =
+        """
+        block: |
+          void main() {
+          \tprintf("Hello, world!\\n");
+          }
+        """
+        |> String.trim()
+
       assert MUT.to_s!(%{block: given}) == expected
     end
+
     test "nested: list / multiline string" do
       assert MUT.to_s!(["a\nb\n", "c"]) == "- |\n  a\n  b\n- c"
     end
+
     test "nested: map / multiline string" do
-      expected = """
-                 a: |-
-                   a1
-                   a2
-                 b: b1
-                 c: |
-                   c1
-                   c2
-                 d: d1
-                 """ |> String.trim()
+      expected =
+        """
+        a: |-
+          a1
+          a2
+        b: b1
+        c: |
+          c1
+          c2
+        d: d1
+        """
+        |> String.trim()
 
       assert MUT.to_s!(%{a: "a1\na2", b: "b1", c: "c1\nc2\n", d: "d1"}) == expected
     end
@@ -292,13 +314,11 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "datetime" do
-      assert MUT.to_s!(~U[2016-05-24 13:26:08Z])      == "2016-05-24T13:26:08Z"
-      assert MUT.to_s!(~U[2016-05-24 13:26:08.1Z])    == "2016-05-24T13:26:08.1Z"
-      assert MUT.to_s!(~U[2016-05-24 13:26:08.02Z])   == "2016-05-24T13:26:08.02Z"
-      assert MUT.to_s!(~U[2016-05-24 13:26:08.003Z])  == "2016-05-24T13:26:08.003Z"
+      assert MUT.to_s!(~U[2016-05-24 13:26:08Z]) == "2016-05-24T13:26:08Z"
+      assert MUT.to_s!(~U[2016-05-24 13:26:08.1Z]) == "2016-05-24T13:26:08.1Z"
+      assert MUT.to_s!(~U[2016-05-24 13:26:08.02Z]) == "2016-05-24T13:26:08.02Z"
+      assert MUT.to_s!(~U[2016-05-24 13:26:08.003Z]) == "2016-05-24T13:26:08.003Z"
       assert MUT.to_s!(~U[2016-05-24 13:26:08.0004Z]) == "2016-05-24T13:26:08.0004Z"
     end
-
   end
-
 end

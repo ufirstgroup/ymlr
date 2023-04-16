@@ -34,10 +34,12 @@ defmodule Ymlr do
   """
   @spec document!(document, opts :: Keyword.t()) :: binary()
   def document!(document, opts \\ [])
+
   def document!({lines, data}, opts) when is_list(lines) do
-    comments = Enum.map_join(lines, "", &("# #{&1}\n"))
+    comments = Enum.map_join(lines, "", &"# #{&1}\n")
     "---\n" <> comments <> Encode.to_s!(data, opts) <> "\n"
   end
+
   def document!({comment, data}, opts), do: document!({[comment], data}, opts)
 
   def document!(data, opts) do
@@ -67,7 +69,7 @@ defmodule Ymlr do
       iex> Ymlr.document({["comment 1", "comment 2"], %{a: 1}})
       {:ok, "---\n# comment 1\n# comment 2\na: 1\n"}
   """
-  @spec document(document, opts::Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
+  @spec document(document, opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
   def document(document, opts \\ []) do
     yml = document!(document, opts)
     {:ok, yml}
@@ -97,9 +99,16 @@ defmodule Ymlr do
       ** (ArgumentError) The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document.
   """
   def documents!(documents, opts \\ [])
-  def documents!(documents, opts) when is_list(documents), do: Enum.map_join(documents, "\n", &document!(&1, opts))
-  def documents!(_documents, _opts), do:
-    raise(ArgumentError, "The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document.")
+
+  def documents!(documents, opts) when is_list(documents),
+    do: Enum.map_join(documents, "\n", &document!(&1, opts))
+
+  def documents!(_documents, _opts),
+    do:
+      raise(
+        ArgumentError,
+        "The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document."
+      )
 
   @doc ~S"""
   Encodes a given list of data as "---" separated YAML documents.
@@ -122,13 +131,14 @@ defmodule Ymlr do
       iex> Ymlr.documents(%{a: "a"})
       {:error, "The given argument is not a list of documents. Use document/1, document/2, document!/1 or document!/2 for a single document."}
   """
-  @spec documents([document], opts::Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
+  @spec documents([document], opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
   def documents(documents, opts \\ []) do
     yml = documents!(documents, opts)
     {:ok, yml}
   rescue
     e in Protocol.UndefinedError ->
       {:error, Exception.message(e)}
+
     e in ArgumentError ->
       {:error, Exception.message(e)}
   end

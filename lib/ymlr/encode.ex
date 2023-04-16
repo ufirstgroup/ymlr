@@ -6,20 +6,36 @@ defmodule Ymlr.Encode do
   # credo:disable-for-this-file Credo.Check.Refactor.CyclomaticComplexity
 
   @quote_when_first [
-    "!", # tag
-    "&", # anchor
-    "*", # alias
-    "{", "}", # flow mapping
-    "[", "]", # flow sequence
-    ",", # flow collection entry separator
-    "#", # comment
-    "|", ">", # block scalar
-    "@", "`", # reserved characters
-    "\"", "'", # double and single quotes
+    # tag
+    "!",
+    # anchor
+    "&",
+    # alias
+    "*",
+    # flow mapping
+    "{",
+    "}",
+    # flow sequence
+    "[",
+    "]",
+    # flow collection entry separator
+    ",",
+    # comment
+    "#",
+    # block scalar
+    "|",
+    ">",
+    # reserved characters
+    "@",
+    "`",
+    # double and single quotes
+    "\"",
+    "'"
   ]
 
   @quote_when_last [
-    ":", # colon
+    # colon
+    ":"
   ]
 
   @doc """
@@ -51,7 +67,7 @@ defmodule Ymlr.Encode do
       iex> Ymlr.Encode.to_s(%{a: 1, b: 2})
       {:ok, "a: 1\nb: 2"}
   """
-  @spec to_s(data::term(), opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
+  @spec to_s(data :: term(), opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
   def to_s(data, opts \\ []) do
     yml = to_s!(data, opts)
     {:ok, yml}
@@ -59,7 +75,7 @@ defmodule Ymlr.Encode do
     e in Protocol.UndefinedError -> {:error, Exception.message(e)}
   end
 
-  @spec map(data::map(), indent_level::integer, opts::Encoder.opts()) :: iodata()
+  @spec map(data :: map(), indent_level :: integer, opts :: Encoder.opts()) :: iodata()
   def map(data, _indent_level, _opts) when data == %{}, do: "{}"
 
   def map(data, indent_level, opts) when is_map(data) do
@@ -67,21 +83,34 @@ defmodule Ymlr.Encode do
     key_encoder = if opts[:atoms], do: &encode_map_key_atoms/1, else: &encode_map_key/1
 
     data
-    |> Map.to_list() # necessary for maps
+    # necessary for maps
+    |> Map.to_list()
     |> Enum.map(fn
-      {key, nil} -> key_encoder.(key)
-      {key, value} when value == [] -> [key_encoder.(key), " []"]
-      {key, value} when value == %{} -> [key_encoder.(key), " {}"]
-      {key, value} when is_map(value)  -> [key_encoder.(key), indentation, "  " | Encoder.encode(value, indent_level + 1, opts)]
-      {key, value} when is_list(value) -> [key_encoder.(key), indentation, "  " | Encoder.encode(value, indent_level + 1, opts)]
-      {key, value} -> [key_encoder.(key), " " | Encoder.encode(value, indent_level + 1, opts)]
+      {key, nil} ->
+        key_encoder.(key)
+
+      {key, value} when value == [] ->
+        [key_encoder.(key), " []"]
+
+      {key, value} when value == %{} ->
+        [key_encoder.(key), " {}"]
+
+      {key, value} when is_map(value) ->
+        [key_encoder.(key), indentation, "  " | Encoder.encode(value, indent_level + 1, opts)]
+
+      {key, value} when is_list(value) ->
+        [key_encoder.(key), indentation, "  " | Encoder.encode(value, indent_level + 1, opts)]
+
+      {key, value} ->
+        [key_encoder.(key), " " | Encoder.encode(value, indent_level + 1, opts)]
     end)
     |> Enum.intersperse(indentation)
   end
 
-  @spec list(data::list(), indent_level::integer, opts::Encoder.opts()) :: iodata()
+  @spec list(data :: list(), indent_level :: integer, opts :: Encoder.opts()) :: iodata()
   def list(data, indent_level, opts) do
     indentation = indent(indent_level)
+
     data
     |> Enum.map(fn
       nil -> "-"
@@ -106,7 +135,12 @@ defmodule Ymlr.Encode do
   defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ":"]
   defp encode_map_key(data) when is_binary(data), do: [encode_binary(data, nil), ":"]
   defp encode_map_key(data) when is_number(data), do: "#{data}:"
-  defp encode_map_key(data), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML (map key).")
+
+  defp encode_map_key(data),
+    do:
+      raise(ArgumentError,
+        message: "The given data #{inspect(data)} cannot be converted to YAML (map key)."
+      )
 
   defp encode_binary(data, indent_level) do
     cond do
@@ -141,10 +175,11 @@ defmodule Ymlr.Encode do
       _ -> false
     end
   rescue
-    # Apparently not needed anymore since Elixir 1.14. Left in for bc but stop covering.
+    #  Apparently not needed anymore since Elixir 1.14. Left in for bc but stop covering.
     # coveralls-ignore-start
-    _ -> false
-    # coveralls-ignore-stop
+    _ ->
+      false
+      # coveralls-ignore-stop
   end
 
   defp with_quotes(data) do
@@ -164,7 +199,10 @@ defmodule Ymlr.Encode do
   # see https://yaml-multiline.info/
   defp multiline(data, level) do
     indentation = indent(level)
-    block = data |> String.trim_trailing("\n") |> String.replace("\n", IO.iodata_to_binary(indentation))
+
+    block =
+      data |> String.trim_trailing("\n") |> String.replace("\n", IO.iodata_to_binary(indentation))
+
     [block_chomping_indicator(data) | [indentation | block]]
   end
 
@@ -175,5 +213,4 @@ defmodule Ymlr.Encode do
   defp indent(level) do
     ["\n" | List.duplicate("  ", level)]
   end
-
 end

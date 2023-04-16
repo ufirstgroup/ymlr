@@ -43,7 +43,7 @@ defmodule Ymlr.MixProject do
       "coveralls.travis": :test,
       "coveralls.github": :test,
       "coveralls.xml": :test,
-      "coveralls.json": :test,
+      "coveralls.json": :test
     ]
   end
 
@@ -55,7 +55,7 @@ defmodule Ymlr.MixProject do
       {:excoveralls, "~> 0.13", only: [:test]},
       {:ex_doc, "~> 0.20", only: :dev},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:yaml_elixir, "~> 2.4", only: [:test]},
+      {:yaml_elixir, "~> 2.4", only: [:test]}
     ]
   end
 
@@ -64,7 +64,7 @@ defmodule Ymlr.MixProject do
       ignore_warnings: ".dialyzer_ignore.exs",
       plt_add_apps: [:mix, :eex],
       plt_core_path: "priv/plts",
-      plt_local_path: "priv/plts",
+      plt_local_path: "priv/plts"
     ]
   end
 

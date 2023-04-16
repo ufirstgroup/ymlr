@@ -89,7 +89,7 @@ defprotocol Ymlr.Encoder do
   @doc """
   Encodes the given data to YAML.
   """
-  @spec encode(data::term(), idnent_level :: integer(), opts :: opts()) :: iodata()
+  @spec encode(data :: term(), idnent_level :: integer(), opts :: opts()) :: iodata()
   def encode(data, idnent_level, opts)
 end
 
@@ -148,9 +148,8 @@ defimpl Ymlr.Encoder, for: Any do
 
           error_keys ->
             raise ArgumentError,
-              "`:only` specified keys (#{inspect(error_keys)}) that are not defined in defstruct: " <>
-                "#{inspect(fields -- [:__struct__])}"
-
+                  "`:only` specified keys (#{inspect(error_keys)}) that are not defined in defstruct: " <>
+                    "#{inspect(fields -- [:__struct__])}"
         end
 
       except = Keyword.get(opts, :except) ->
@@ -160,9 +159,8 @@ defimpl Ymlr.Encoder, for: Any do
 
           error_keys ->
             raise ArgumentError,
-              "`:except` specified keys (#{inspect(error_keys)}) that are not defined in defstruct: " <>
-                "#{inspect(fields -- [:__struct__])}"
-
+                  "`:except` specified keys (#{inspect(error_keys)}) that are not defined in defstruct: " <>
+                    "#{inspect(fields -- [:__struct__])}"
         end
 
       true ->
@@ -171,29 +169,31 @@ defimpl Ymlr.Encoder, for: Any do
   end
 end
 
-defimpl Ymlr.Encoder, for: Map  do
+defimpl Ymlr.Encoder, for: Map do
   def encode(data, idnent_level, opts), do: Ymlr.Encode.map(data, idnent_level, opts)
 end
 
-defimpl Ymlr.Encoder, for: [Date, Time, NaiveDateTime]  do
+defimpl Ymlr.Encoder, for: [Date, Time, NaiveDateTime] do
   def encode(data, _level, _opts), do: @for.to_iso8601(data)
 end
 
-defimpl Ymlr.Encoder, for: DateTime  do
+defimpl Ymlr.Encoder, for: DateTime do
   def encode(data, _level, _opts) do
     data |> DateTime.shift_zone!("Etc/UTC") |> DateTime.to_iso8601()
   end
 end
 
-defimpl Ymlr.Encoder, for: List  do
+defimpl Ymlr.Encoder, for: List do
   def encode(data, idnent_level, opts), do: Ymlr.Encode.list(data, idnent_level, opts)
 end
 
-defimpl Ymlr.Encoder, for: Tuple  do
-  def encode(data, idnent_level, opts), do: Ymlr.Encode.list(Tuple.to_list(data), idnent_level, opts)
+defimpl Ymlr.Encoder, for: Tuple do
+  def encode(data, idnent_level, opts) do
+    Ymlr.Encode.list(Tuple.to_list(data), idnent_level, opts)
+  end
 end
 
-defimpl Ymlr.Encoder, for: Atom  do
+defimpl Ymlr.Encoder, for: Atom do
   def encode(data, _idnent_level, _opts), do: Ymlr.Encode.atom(data)
 end
 
