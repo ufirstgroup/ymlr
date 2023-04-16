@@ -157,6 +157,15 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!(%{a: nil}) == "a:"
     end
 
+    test "maps with atoms: true" do
+      assert MUT.to_s!(%{a: 1}, atoms: true) == ":a: 1"
+      assert MUT.to_s!(%{a: 1, b: 2}, atoms: true) == ":a: 1\n:b: 2"
+      assert MUT.to_s!(%{"a" => 1, "b" => 2}, atoms: true) == "a: 1\nb: 2"
+      assert MUT.to_s!(%{"a b" => 1, "c d" => 2}, atoms: true) == "a b: 1\nc d: 2"
+      assert MUT.to_s!(%{1 => 1, 2 => 2}, atoms: true) == "1: 1\n2: 2"
+      assert MUT.to_s!(%{a: nil}, atoms: true) == ":a:"
+    end
+
     test "invalid map key" do
       assert_raise ArgumentError, fn ->
         MUT.to_s!(%{%{a: 1} => 2})

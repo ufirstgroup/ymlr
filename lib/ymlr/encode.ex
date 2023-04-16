@@ -36,10 +36,10 @@ defmodule Ymlr.Encode do
       iex> Ymlr.Encode.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
       "a: a\\nb: b\\nc: 'true'\\nd: '100'"
   """
-  @spec to_s!(term()) :: binary()
-  def to_s!(data) do
+  @spec to_s!(data :: term(), opts :: Encoder.opts()) :: binary()
+  def to_s!(data, opts \\ []) do
     data
-    |> Ymlr.Encoder.encode()
+    |> Ymlr.Encoder.encode(0, opts)
     |> IO.iodata_to_binary()
   end
 
@@ -51,59 +51,64 @@ defmodule Ymlr.Encode do
       iex> Ymlr.Encode.to_s(%{a: 1, b: 2})
       {:ok, "a: 1\nb: 2"}
   """
-  @spec to_s(term()) :: {:ok, binary()} | {:error, binary()}
-  def to_s(data) do
-    yml = to_s!(data)
+  @spec to_s(data::term(), opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
+  def to_s(data, opts \\ []) do
+    yml = to_s!(data, opts)
     {:ok, yml}
   rescue
     e in Protocol.UndefinedError -> {:error, Exception.message(e)}
   end
 
-  @spec map(map(), integer) :: iodata()
-  def map(data, _level) when data == %{}, do: "{}"
+  @spec map(data::map(), indent_level::integer,opts::Encoder.opts()) :: iodata()
+  def map(data, _indent_level, _opts) when data == %{}, do: "{}"
 
-  def map(data, level) when is_map(data) do
-    indentation = indent(level)
+  def map(data, indent_level, opts) when is_map(data) do
+    indentation = indent(indent_level)
+    key_encoder = if opts[:atoms], do: &encode_map_key_atoms/1, else: &encode_map_key/1
+
     data
     |> Map.to_list() # necessary for maps
     |> Enum.map(fn
-      {key, nil} -> encode_map_key(key)
-      {key, value} when value == [] -> [encode_map_key(key), " []"]
-      {key, value} when value == %{} -> [encode_map_key(key), " {}"]
-      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | Encoder.encode(value, level + 1)]
-      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | Encoder.encode(value, level + 1)]
-      {key, value} -> [encode_map_key(key), " " | Encoder.encode(value, level + 1)]
+      {key, nil} -> key_encoder.(key)
+      {key, value} when value == [] -> [key_encoder.(key), " []"]
+      {key, value} when value == %{} -> [key_encoder.(key), " {}"]
+      {key, value} when is_map(value)  -> [key_encoder.(key), indentation, "  " | Encoder.encode(value, indent_level + 1, opts)]
+      {key, value} when is_list(value) -> [key_encoder.(key), indentation, "  " | Encoder.encode(value, indent_level + 1, opts)]
+      {key, value} -> [key_encoder.(key), " " | Encoder.encode(value, indent_level + 1, opts)]
     end)
     |> Enum.intersperse(indentation)
   end
 
-  @spec list(list(), integer) :: iodata()
-  def list(data, level) do
-    indentation = indent(level)
+  @spec list(data::list(), indent_level::integer, opts::Encoder.opts()) :: iodata()
+  def list(data, indent_level, opts) do
+    indentation = indent(indent_level)
     data
     |> Enum.map(fn
       nil -> "-"
       "" -> ~s(- "")
-      value -> ["- " | Encoder.encode(value, level + 1)]
+      value -> ["- " | Encoder.encode(value, indent_level + 1, opts)]
     end)
     |> Enum.intersperse(indentation)
   end
 
-  @spec atom(atom(), integer) :: iodata()
-  def atom(data, _), do: Atom.to_string(data)
+  @spec atom(atom()) :: iodata()
+  def atom(data), do: Atom.to_string(data)
 
   @spec string(binary(), integer) :: iodata()
-  def string(data, level), do: encode_binary(data, level)
+  def string(data, indent_level), do: encode_binary(data, indent_level)
 
-  @spec number(number(), integer) :: iodata()
-  def number(data, _), do: "#{data}"
+  @spec number(number()) :: iodata()
+  def number(data), do: "#{data}"
+
+  defp encode_map_key_atoms(data) when is_atom(data), do: [":", Atom.to_string(data), ":"]
+  defp encode_map_key_atoms(data), do: encode_map_key(data)
 
   defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ":"]
   defp encode_map_key(data) when is_binary(data), do: [encode_binary(data, nil), ":"]
   defp encode_map_key(data) when is_number(data), do: "#{data}:"
   defp encode_map_key(data), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML (map key).")
 
-  defp encode_binary(data, level) do
+  defp encode_binary(data, indent_level) do
     cond do
       data == "" -> ~S('')
       data == "null" -> ~S('null')
@@ -113,7 +118,7 @@ defmodule Ymlr.Encode do
       data == "false" -> ~S('false')
       data == "True" -> ~S('True')
       data == "False" -> ~S('False')
-      String.contains?(data, "\n") -> multiline(data, level)
+      String.contains?(data, "\n") -> multiline(data, indent_level)
       String.contains?(data, "\t") -> ~s("#{data}")
       String.at(data, 0) in @quote_when_first -> with_quotes(data)
       String.at(data, -1) in @quote_when_last -> with_quotes(data)

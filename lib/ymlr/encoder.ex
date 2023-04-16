@@ -84,11 +84,13 @@ defprotocol Ymlr.Encoder do
 
   @fallback_to_any true
 
+  @type opts :: keyword()
+
   @doc """
   Encodes the given data to YAML.
   """
-  @spec encode(data::term(), idnent_level :: integer()) :: iodata()
-  def encode(data, idnent_level \\ 0)
+  @spec encode(data::term(), idnent_level :: integer(), opts :: opts()) :: iodata()
+  def encode(data, idnent_level, opts)
 end
 
 defimpl Ymlr.Encoder, for: Any do
@@ -97,16 +99,16 @@ defimpl Ymlr.Encoder, for: Any do
 
     quote do
       defimpl Ymlr.Encoder, for: unquote(module) do
-        def encode(data, idnent_level) do
+        def encode(data, idnent_level, opts) do
           data
           |> Map.take(unquote(fields))
-          |> Ymlr.Encode.map(idnent_level)
+          |> Ymlr.Encode.map(idnent_level, opts)
         end
       end
     end
   end
 
-  def encode(%_{} = struct, _level) do
+  def encode(%_{} = struct, _level, _opts) do
     raise Protocol.UndefinedError,
       protocol: @protocol,
       value: struct,
@@ -128,7 +130,7 @@ defimpl Ymlr.Encoder, for: Any do
       """
   end
 
-  def encode(value, _level) do
+  def encode(value, _level, _opts) do
     raise Protocol.UndefinedError,
       protocol: @protocol,
       value: value,
@@ -170,33 +172,33 @@ defimpl Ymlr.Encoder, for: Any do
 end
 
 defimpl Ymlr.Encoder, for: Map  do
-  def encode(data, idnent_level), do: Ymlr.Encode.map(data, idnent_level)
+  def encode(data, idnent_level, opts), do: Ymlr.Encode.map(data, idnent_level, opts)
 end
 
 defimpl Ymlr.Encoder, for: [Date, Time, NaiveDateTime]  do
-  def encode(data, _level), do: @for.to_iso8601(data)
+  def encode(data, _level, _opts), do: @for.to_iso8601(data)
 end
 
 defimpl Ymlr.Encoder, for: DateTime  do
-  def encode(data, _level) do
+  def encode(data, _level, _opts) do
     data |> DateTime.shift_zone!("Etc/UTC") |> DateTime.to_iso8601()
   end
 end
 
 defimpl Ymlr.Encoder, for: List  do
-  def encode(data, idnent_level), do: Ymlr.Encode.list(data, idnent_level)
+  def encode(data, idnent_level, opts), do: Ymlr.Encode.list(data, idnent_level, opts)
 end
 
 defimpl Ymlr.Encoder, for: Atom  do
-  def encode(data, idnent_level), do: Ymlr.Encode.atom(data, idnent_level)
+  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.atom(data)
 end
 
 defimpl Ymlr.Encoder, for: BitString do
-  def encode(binary, opts) when is_binary(binary) do
-    Ymlr.Encode.string(binary, opts)
+  def encode(binary, indent_level, _opts) when is_binary(binary) do
+    Ymlr.Encode.string(binary, indent_level)
   end
 
-  def encode(bitstring, _opts) do
+  def encode(bitstring, _indent_level, _opts) do
     raise Protocol.UndefinedError,
       protocol: @protocol,
       value: bitstring,
@@ -205,15 +207,15 @@ defimpl Ymlr.Encoder, for: BitString do
 end
 
 defimpl Ymlr.Encoder, for: Integer do
-  def encode(data, idnent_level), do: Ymlr.Encode.number(data, idnent_level)
+  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.number(data)
 end
 
 defimpl Ymlr.Encoder, for: Float do
-  def encode(data, idnent_level), do: Ymlr.Encode.number(data, idnent_level)
+  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.number(data)
 end
 
 defimpl Ymlr.Encoder, for: Decimal do
-  def encode(data, _opts) do
+  def encode(data, _indent_level, _opts) do
     # silence the xref warning
     decimal = Decimal
     decimal.to_string(data)
