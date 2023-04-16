@@ -1,13 +1,9 @@
 defmodule Ymlr.Encode do
-  @moduledoc """
-  Encodes data into YAML strings.
-  """
+  @moduledoc false
 
   alias Ymlr.Encoder
 
   # credo:disable-for-this-file Credo.Check.Refactor.CyclomaticComplexity
-
-  @type data :: map() | [data] | atom() | binary() | number()
 
   @quote_when_first [
     "!", # tag
@@ -40,7 +36,7 @@ defmodule Ymlr.Encode do
       iex> Ymlr.Encode.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
       "a: a\\nb: b\\nc: 'true'\\nd: '100'"
   """
-  @spec to_s!(data) :: binary()
+  @spec to_s!(term()) :: binary()
   def to_s!(data) do
     data
     |> Ymlr.Encoder.encode()
@@ -55,7 +51,7 @@ defmodule Ymlr.Encode do
       iex> Ymlr.Encode.to_s(%{a: 1, b: 2})
       {:ok, "a: 1\nb: 2"}
   """
-  @spec to_s(data) :: {:ok, binary()} | {:error, binary()}
+  @spec to_s(term()) :: {:ok, binary()} | {:error, binary()}
   def to_s(data) do
     yml = to_s!(data)
     {:ok, yml}
@@ -63,6 +59,7 @@ defmodule Ymlr.Encode do
     e in Protocol.UndefinedError -> {:error, Exception.message(e)}
   end
 
+  @spec map(map(), integer) :: iodata()
   def map(data, _level) when data == %{}, do: "{}"
 
   def map(data, level) when is_map(data) do
@@ -80,6 +77,7 @@ defmodule Ymlr.Encode do
     |> Enum.intersperse(indentation)
   end
 
+  @spec list(list(), integer) :: iodata()
   def list(data, level) do
     indentation = indent(level)
     data
@@ -91,10 +89,13 @@ defmodule Ymlr.Encode do
     |> Enum.intersperse(indentation)
   end
 
+  @spec atom(atom(), integer) :: iodata()
   def atom(data, _), do: Atom.to_string(data)
 
+  @spec string(binary(), integer) :: iodata()
   def string(data, level), do: encode_binary(data, level)
 
+  @spec number(number(), integer) :: iodata()
   def number(data, _), do: "#{data}"
 
   defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ":"]

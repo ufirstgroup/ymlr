@@ -1,13 +1,94 @@
 defprotocol Ymlr.Encoder do
+  @moduledoc """
+  Protocol controlling how a value is encoded to YAML.
+
+  ## Deriving
+
+  The protocol allows leveraging the Elixir's `@derive` feature to simplify
+  protocol implementation in trivial cases. Accepted options are:
+
+    * `:only` - encodes only values of specified keys.
+    * `:except` - encodes all struct fields except specified keys.
+
+  By default all keys except the `:__struct__` key are encoded.
+
+  ## Example
+
+  Let's assume a presence of the following struct:
+
+  ```
+  defmodule Test do
+    defstruct [:foo, :bar, :baz]
+  end
+  ```
+
+  If we were to call `@derive Ymlr.Encoder` just before `defstruct`, an
+  implementation similar to the following implementation would be generated:
+
+  ```
+  defimpl Ymlr.Encoder, for: Test do
+    def encode(data, idnent_level) do
+      data
+      |> Map.take(unquote([:foo, :bar, :baz]))
+      |> Ymlr.Encode.map(idnent_level)
+    end
+  end
+  ```
+
+  ### Limit fields using the `only` Option
+
+  We can limit the fields being encoded using the `:only` option:
+
+  ```
+  defmodule Test do
+    @derive {Ymlr.Encoder, only: [:foo]}
+    defstruct [:foo, :bar, :baz]
+  end
+  ```
+
+  This would generate an implementation similar to the following:
+
+  ```
+  defimpl Ymlr.Encoder, for: Test do
+    def encode(data, idnent_level) do
+      data
+      |> Map.take(unquote([:foo]))
+      |> Ymlr.Encode.map(idnent_level)
+    end
+  end
+  ```
+
+  ### Exclude fields using the `except` Option
+
+  We can exclude the fields being encoded using the `:except` option:
+
+  ```
+  defmodule Test do
+    @derive {Ymlr.Encoder, except: [:foo]}
+    defstruct [:foo, :bar, :baz]
+  end
+  ```
+
+  This would generate an implementation similar to the following:
+
+  ```
+  defimpl Ymlr.Encoder, for: Test do
+    def encode(data, idnent_level) do
+      data
+      |> Map.take(unquote([:bar, :baz]))
+      |> Ymlr.Encode.map(idnent_level)
+    end
+  end
+  ```
+  """
+
   @fallback_to_any true
 
-  @type t :: term
-
-  @spec encode(value::t(), idnent_level :: integer()) :: iodata()
-  def encode(value, idnent_level \\ 0)
-
-  # @spec encode_map_key(key::t()) :: iodata()
-  # def encode_map_key(key)
+  @doc """
+  Encodes the given data to YAML.
+  """
+  @spec encode(data::term(), idnent_level :: integer()) :: iodata()
+  def encode(data, idnent_level \\ 0)
 end
 
 defimpl Ymlr.Encoder, for: Any do
@@ -16,11 +97,10 @@ defimpl Ymlr.Encoder, for: Any do
 
     quote do
       defimpl Ymlr.Encoder, for: unquote(module) do
-        def encode(data, level) do
+        def encode(data, idnent_level) do
           data
-          |> Map.from_struct()
           |> Map.take(unquote(fields))
-          |> Ymlr.Encoder.encode(level)
+          |> Ymlr.Encode.map(idnent_level)
         end
       end
     end
@@ -90,7 +170,7 @@ defimpl Ymlr.Encoder, for: Any do
 end
 
 defimpl Ymlr.Encoder, for: Map  do
-  def encode(data, level), do: Ymlr.Encode.map(data, level)
+  def encode(data, idnent_level), do: Ymlr.Encode.map(data, idnent_level)
 end
 
 defimpl Ymlr.Encoder, for: [Date, Time, NaiveDateTime]  do
@@ -104,11 +184,11 @@ defimpl Ymlr.Encoder, for: DateTime  do
 end
 
 defimpl Ymlr.Encoder, for: List  do
-  def encode(data, level), do: Ymlr.Encode.list(data, level)
+  def encode(data, idnent_level), do: Ymlr.Encode.list(data, idnent_level)
 end
 
 defimpl Ymlr.Encoder, for: Atom  do
-  def encode(data, level), do: Ymlr.Encode.atom(data, level)
+  def encode(data, idnent_level), do: Ymlr.Encode.atom(data, idnent_level)
 end
 
 defimpl Ymlr.Encoder, for: BitString do
@@ -125,11 +205,11 @@ defimpl Ymlr.Encoder, for: BitString do
 end
 
 defimpl Ymlr.Encoder, for: Integer do
-  def encode(data, level), do: Ymlr.Encode.number(data, level)
+  def encode(data, idnent_level), do: Ymlr.Encode.number(data, idnent_level)
 end
 
 defimpl Ymlr.Encoder, for: Float do
-  def encode(data, level), do: Ymlr.Encode.number(data, level)
+  def encode(data, idnent_level), do: Ymlr.Encode.number(data, idnent_level)
 end
 
 defimpl Ymlr.Encoder, for: Decimal do

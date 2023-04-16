@@ -1,12 +1,12 @@
 defmodule Ymlr do
   @moduledoc """
-  Encodes data into YAML documents using the `Ymlr.Encode`.
+  Encodes data into YAML documents using the `Ymlr.Encoder` protocol.
   Every document starts with a separator ("---") and can be enhanced with comments.
   """
 
   alias Ymlr.Encode
 
-  @type document :: Encode.data | {binary(), Encode.data} | {[binary()], Encode.data}
+  @type document :: term() | {binary(), term()} | {[binary()], term()}
 
   @doc ~S"""
   Encodes a given data as YAML document with a separator ("---") at the beginning. Raises if it cannot be encoded.
