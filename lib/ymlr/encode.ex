@@ -59,7 +59,7 @@ defmodule Ymlr.Encode do
     e in Protocol.UndefinedError -> {:error, Exception.message(e)}
   end
 
-  @spec map(data::map(), indent_level::integer,opts::Encoder.opts()) :: iodata()
+  @spec map(data::map(), indent_level::integer, opts::Encoder.opts()) :: iodata()
   def map(data, _indent_level, _opts) when data == %{}, do: "{}"
 
   def map(data, indent_level, opts) when is_map(data) do

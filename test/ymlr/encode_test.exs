@@ -188,14 +188,17 @@ defmodule Ymlr.EncodeTest do
       assert "bar: 2" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
     end
 
-    test "tuples - not supported" do
-      assert {:error, error} = MUT.to_s({"a", "b"})
+    test "pids - not supported" do
+      assert {:error, error} = MUT.to_s(self())
       assert is_binary(error)
     end
 
+    test "tuples" do
+      assert {:ok, "- a\n- b"} = MUT.to_s({"a", "b"})
+    end
+
     test "tuples (nested) - not supported" do
-      assert {:error, error} = MUT.to_s([{"a", "b"}])
-      assert is_binary(error)
+      assert {:ok, "- - a\n  - b"} = MUT.to_s([{"a", "b"}])
     end
 
     test "nested: list / list" do

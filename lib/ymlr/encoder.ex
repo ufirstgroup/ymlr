@@ -189,6 +189,10 @@ defimpl Ymlr.Encoder, for: List  do
   def encode(data, idnent_level, opts), do: Ymlr.Encode.list(data, idnent_level, opts)
 end
 
+defimpl Ymlr.Encoder, for: Tuple  do
+  def encode(data, idnent_level, opts), do: Ymlr.Encode.list(Tuple.to_list(data), idnent_level, opts)
+end
+
 defimpl Ymlr.Encoder, for: Atom  do
   def encode(data, _idnent_level, _opts), do: Ymlr.Encode.atom(data)
 end
