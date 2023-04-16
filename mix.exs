@@ -52,7 +52,7 @@ defmodule Ymlr.MixProject do
       {:credo, "~> 1.5-pre", only: [:dev, :test], runtime: false},
       {:decimal, "~> 2.0", only: [:test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.13", only: [:test]},
+      {:excoveralls, "~> 0.16", only: [:test]},
       {:ex_doc, "~> 0.29", only: :dev},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:yaml_elixir, "~> 2.4", only: [:test]}
