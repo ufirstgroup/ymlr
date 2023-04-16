@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+
+### Breaking Change
+
+**Up to and including version 3.x, `ymlr` would encode structs out of the box.
+This version introduces protocols so and structs need to `@derive Ymlr.Encoder`
+in order to be encoded. See the documentation of the `Ymlr.Encoder` protocol
+for further information.**
+
+### Changed
+
+* A protocol based implementation was added which give more freedom to users of this library - [#118](https://github.com/ufirstgroup/ymlr/pull/118)
+
 <!-- Add your changelog entry to the relevant subsection -->
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
