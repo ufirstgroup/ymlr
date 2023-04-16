@@ -66,12 +66,9 @@ jobs:
         run: mix credo --strict
 
       - name: Run Coverage
-        run: mix coveralls.json
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          files: ./cover/excoveralls.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mix coveralls.github --include integration
 
       # Create PLTs if no cache was found
       - name: Create PLTs

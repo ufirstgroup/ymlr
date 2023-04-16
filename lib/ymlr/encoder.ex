@@ -1,189 +1,227 @@
-defmodule Ymlr.Encoder do
+defprotocol Ymlr.Encoder do
   @moduledoc """
-  Encodes data into YAML strings.
+  Protocol controlling how a value is encoded to YAML.
+
+  ## Deriving
+
+  The protocol allows leveraging the Elixir's `@derive` feature to simplify
+  protocol implementation in trivial cases. Accepted options are:
+
+    * `:only` - encodes only values of specified keys.
+    * `:except` - encodes all struct fields except specified keys.
+
+  By default all keys except the `:__struct__` key are encoded.
+
+  ## Example
+
+  Let's assume a presence of the following struct:
+
+  ```
+  defmodule Test do
+    defstruct [:foo, :bar, :baz]
+  end
+  ```
+
+  If we were to call `@derive Ymlr.Encoder` just before `defstruct`, an
+  implementation similar to the following implementation would be generated:
+
+  ```
+  defimpl Ymlr.Encoder, for: Test do
+    def encode(data, idnent_level) do
+      data
+      |> Map.take(unquote([:foo, :bar, :baz]))
+      |> Ymlr.Encode.map(idnent_level)
+    end
+  end
+  ```
+
+  ### Limit fields using the `only` Option
+
+  We can limit the fields being encoded using the `:only` option:
+
+  ```
+  defmodule Test do
+    @derive {Ymlr.Encoder, only: [:foo]}
+    defstruct [:foo, :bar, :baz]
+  end
+  ```
+
+  This would generate an implementation similar to the following:
+
+  ```
+  defimpl Ymlr.Encoder, for: Test do
+    def encode(data, idnent_level) do
+      data
+      |> Map.take(unquote([:foo]))
+      |> Ymlr.Encode.map(idnent_level)
+    end
+  end
+  ```
+
+  ### Exclude fields using the `except` Option
+
+  We can exclude the fields being encoded using the `:except` option:
+
+  ```
+  defmodule Test do
+    @derive {Ymlr.Encoder, except: [:foo]}
+    defstruct [:foo, :bar, :baz]
+  end
+  ```
+
+  This would generate an implementation similar to the following:
+
+  ```
+  defimpl Ymlr.Encoder, for: Test do
+    def encode(data, idnent_level) do
+      data
+      |> Map.take(unquote([:bar, :baz]))
+      |> Ymlr.Encode.map(idnent_level)
+    end
+  end
+  ```
   """
 
-  # credo:disable-for-this-file Credo.Check.Refactor.CyclomaticComplexity
+  @fallback_to_any true
 
-  @type data :: map() | [data] | atom() | binary() | number()
-
-  @quote_when_first [
-    "!", # tag
-    "&", # anchor
-    "*", # alias
-    "{", "}", # flow mapping
-    "[", "]", # flow sequence
-    ",", # flow collection entry separator
-    "#", # comment
-    "|", ">", # block scalar
-    "@", "`", # reserved characters
-    "\"", "'", # double and single quotes
-  ]
-
-  @quote_when_last [
-    ":", # colon
-  ]
+  @type opts :: keyword()
 
   @doc """
-  Encodes the given data as YAML string. Raises if it cannot be encoded.
-
-  ## Examples
-
-      iex> Ymlr.Encoder.to_s!(%{})
-      "{}"
-
-      iex> Ymlr.Encoder.to_s!(%{a: 1, b: 2})
-      "a: 1\\nb: 2"
-
-      iex> Ymlr.Encoder.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
-      "a: a\\nb: b\\nc: 'true'\\nd: '100'"
-
-      iex> Ymlr.Encoder.to_s!({"a", "b"})
-      ** (ArgumentError) The given data {\"a\", \"b\"} cannot be converted to YAML.
+  Encodes the given data to YAML.
   """
-  @spec to_s!(data) :: binary()
-  def to_s!(data) do
-    data
-    |> encode_as_io_list()
-    |> IO.iodata_to_binary()
+  @spec encode(data::term(), idnent_level :: integer(), opts :: opts()) :: iodata()
+  def encode(data, idnent_level, opts)
+end
+
+defimpl Ymlr.Encoder, for: Any do
+  defmacro __deriving__(module, struct, opts) do
+    fields = fields_to_encode(struct, opts)
+
+    quote do
+      defimpl Ymlr.Encoder, for: unquote(module) do
+        def encode(data, idnent_level, opts) do
+          data
+          |> Map.take(unquote(fields))
+          |> Ymlr.Encode.map(idnent_level, opts)
+        end
+      end
+    end
   end
 
-  @doc """
-  Encodes the given data as YAML string.
-
-  ## Examples
-
-      iex> Ymlr.Encoder.to_s(%{a: 1, b: 2})
-      {:ok, "a: 1\\nb: 2"}
-
-      iex> Ymlr.Encoder.to_s({"a", "b"})
-      {:error, "The given data {\\"a\\", \\"b\\"} cannot be converted to YAML."}
-  """
-  @spec to_s(data) :: {:ok, binary()} | {:error, binary()}
-  def to_s(data) do
-    yml = to_s!(data)
-    {:ok, yml}
-  rescue
-    e in ArgumentError -> {:error, e.message}
+  def encode(%_{} = struct, _level, _opts) do
+    raise Protocol.UndefinedError,
+      protocol: @protocol,
+      value: struct,
+      description: """
+      Ymlr.Encoder protocol must always be explicitly implemented.
+      If you own the struct, you can derive the implementation specifying \
+      which fields should be encoded to YAML:
+          @derive {Ymlr.Encoder, only: [....]}
+          defstruct ...
+      It is also possible to encode all fields, although this should be \
+      used carefully to avoid accidentally leaking private information \
+      when new fields are added:
+          @derive Ymlr.Encoder
+          defstruct ...
+      Finally, if you don't own the struct you want to encode to YAML, \
+      you may use Protocol.derive/3 placed outside of any module:
+          Protocol.derive(Ymlr.Encoder, NameOfTheStruct, only: [...])
+          Protocol.derive(Ymlr.Encoder, NameOfTheStruct)
+      """
   end
 
-  defp encode_as_io_list(data, level \\ 0)
-
-  defp encode_as_io_list(data, _level) when data == %{} do
-    "{}"
+  def encode(value, _level, _opts) do
+    raise Protocol.UndefinedError,
+      protocol: @protocol,
+      value: value,
+      description: "Ymlr.Encoder protocol must always be explicitly implemented"
   end
 
-  defp encode_as_io_list(%Date{} = data, _), do: Date.to_iso8601(data)
+  defp fields_to_encode(struct, opts) do
+    fields = Map.keys(struct)
 
-  defp encode_as_io_list(%DateTime{} = data, _) do
+    cond do
+      only = Keyword.get(opts, :only) ->
+        case only -- fields do
+          [] ->
+            only
+
+          error_keys ->
+            raise ArgumentError,
+              "`:only` specified keys (#{inspect(error_keys)}) that are not defined in defstruct: " <>
+                "#{inspect(fields -- [:__struct__])}"
+
+        end
+
+      except = Keyword.get(opts, :except) ->
+        case except -- fields do
+          [] ->
+            fields -- [:__struct__ | except]
+
+          error_keys ->
+            raise ArgumentError,
+              "`:except` specified keys (#{inspect(error_keys)}) that are not defined in defstruct: " <>
+                "#{inspect(fields -- [:__struct__])}"
+
+        end
+
+      true ->
+        fields -- [:__struct__]
+    end
+  end
+end
+
+defimpl Ymlr.Encoder, for: Map  do
+  def encode(data, idnent_level, opts), do: Ymlr.Encode.map(data, idnent_level, opts)
+end
+
+defimpl Ymlr.Encoder, for: [Date, Time, NaiveDateTime]  do
+  def encode(data, _level, _opts), do: @for.to_iso8601(data)
+end
+
+defimpl Ymlr.Encoder, for: DateTime  do
+  def encode(data, _level, _opts) do
     data |> DateTime.shift_zone!("Etc/UTC") |> DateTime.to_iso8601()
   end
+end
 
-  defp encode_as_io_list(data, level) when is_map(data) do
-    indentation = indent(level)
-    data
-    |> Map.to_list() # necessary for maps
-    |> Keyword.delete(:__struct__) # if it actually was a map
-    |> Enum.map(fn
-      {key, nil} -> encode_map_key(key)
-      {key, value} when value == [] -> [encode_map_key(key), " []"]
-      {key, value} when value == %{} -> [encode_map_key(key), " {}"]
-      {key, value} when is_map(value)  -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
-      {key, value} when is_list(value) -> [encode_map_key(key), indentation, "  " | encode_as_io_list(value, level + 1)]
-      {key, value} -> [encode_map_key(key), " " | encode_as_io_list(value, level + 1)]
-    end)
-    |> Enum.intersperse(indentation)
+defimpl Ymlr.Encoder, for: List  do
+  def encode(data, idnent_level, opts), do: Ymlr.Encode.list(data, idnent_level, opts)
+end
+
+defimpl Ymlr.Encoder, for: Tuple  do
+  def encode(data, idnent_level, opts), do: Ymlr.Encode.list(Tuple.to_list(data), idnent_level, opts)
+end
+
+defimpl Ymlr.Encoder, for: Atom  do
+  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.atom(data)
+end
+
+defimpl Ymlr.Encoder, for: BitString do
+  def encode(binary, indent_level, _opts) when is_binary(binary) do
+    Ymlr.Encode.string(binary, indent_level)
   end
 
-  defp encode_as_io_list(data, level) when is_list(data) do
-    indentation = indent(level)
-    data
-    |> Enum.map(fn
-      nil -> "-"
-      "" -> ~s(- "")
-      value -> ["- " | encode_as_io_list(value, level + 1)]
-    end)
-    |> Enum.intersperse(indentation)
+  def encode(bitstring, _indent_level, _opts) do
+    raise Protocol.UndefinedError,
+      protocol: @protocol,
+      value: bitstring,
+      description: "cannot encode a bitstring to YAML"
   end
+end
 
-  defp encode_as_io_list(data, _) when is_atom(data), do: Atom.to_string(data)
-  defp encode_as_io_list(data, level) when is_binary(data), do: encode_binary(data, level)
+defimpl Ymlr.Encoder, for: Integer do
+  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.number(data)
+end
 
-  defp encode_as_io_list(data, _) when is_number(data), do: "#{data}"
+defimpl Ymlr.Encoder, for: Float do
+  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.number(data)
+end
 
-  defp encode_as_io_list(data, _), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML.")
-
-  defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ":"]
-  defp encode_map_key(data) when is_binary(data), do: [encode_binary(data, nil), ":"]
-  defp encode_map_key(data) when is_number(data), do: "#{data}:"
-  defp encode_map_key(data), do: raise(ArgumentError, message: "The given data #{inspect(data)} cannot be converted to YAML (map key).")
-
-  defp encode_binary(data, level) do
-    cond do
-      data == "" -> ~S('')
-      data == "null" -> ~S('null')
-      data == "yes" -> ~S('yes')
-      data == "no" -> ~S('no')
-      data == "true" -> ~S('true')
-      data == "false" -> ~S('false')
-      data == "True" -> ~S('True')
-      data == "False" -> ~S('False')
-      String.contains?(data, "\n") -> multiline(data, level)
-      String.contains?(data, "\t") -> ~s("#{data}")
-      String.at(data, 0) in @quote_when_first -> with_quotes(data)
-      String.at(data, -1) in @quote_when_last -> with_quotes(data)
-      String.starts_with?(data, "- ") -> with_quotes(data)
-      String.starts_with?(data, ": ") -> with_quotes(data)
-      String.starts_with?(data, "? ") -> with_quotes(data)
-      String.contains?(data, " #") -> with_quotes(data)
-      String.contains?(data, ": ") -> with_quotes(data)
-      String.starts_with?(data, "0b") -> with_quotes(data)
-      String.starts_with?(data, "0o") -> with_quotes(data)
-      String.starts_with?(data, "0x") -> with_quotes(data)
-      is_numeric(data) -> with_quotes(data)
-      true -> data
-    end
+defimpl Ymlr.Encoder, for: Decimal do
+  def encode(data, _indent_level, _opts) do
+    # silence the xref warning
+    decimal = Decimal
+    decimal.to_string(data)
   end
-
-  defp is_numeric(string) do
-    case Float.parse(string) do
-      {_, ""} -> true
-      _ -> false
-    end
-  rescue
-    # Apparently not needed anymore since Elixir 1.14. Left in for bc but stop covering.
-    # coveralls-ignore-start
-    _ -> false
-    # coveralls-ignore-stop
-  end
-
-  defp with_quotes(data) do
-    if String.contains?(data, "'") do
-      ~s("#{escape(data)}")
-    else
-      ~s('#{data}')
-    end
-  end
-
-  defp escape(data) do
-    data |> String.replace("\\", "\\\\") |> String.replace(~s("), ~s(\\"))
-  end
-
-  # for example for map keys
-  defp multiline(data, nil), do: inspect(data)
-  # see https://yaml-multiline.info/
-  defp multiline(data, level) do
-    indentation = indent(level)
-    block = data |> String.trim_trailing("\n") |> String.replace("\n", IO.iodata_to_binary(indentation))
-    [block_chomping_indicator(data) | [indentation | block]]
-  end
-
-  defp block_chomping_indicator(data) do
-    if String.ends_with?(data, "\n"), do: "|", else: "|-"
-  end
-
-  defp indent(level) do
-    ["\n" | List.duplicate("  ", level)]
-  end
-
 end

@@ -14,6 +14,7 @@ defmodule Ymlr.MixProject do
       dialyzer: dialyzer(),
       package: package(),
       preferred_cli_env: cli_env(),
+      consolidate_protocols: Mix.env() != :test,
       test_coverage: [
         tool: ExCoveralls
       ],
@@ -22,8 +23,8 @@ defmodule Ymlr.MixProject do
         extras: ["README.md", "usage.livemd", "CHANGELOG.md"],
         source_ref: "v#{@version}",
         source_url: @source_url
-      ]
-
+      ],
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -49,6 +50,7 @@ defmodule Ymlr.MixProject do
   defp deps do
     [
       {:credo, "~> 1.5-pre", only: [:dev, :test], runtime: false},
+      {:decimal, "~> 2.0", only: [:test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.13", only: [:test]},
       {:ex_doc, "~> 0.20", only: :dev},
@@ -77,4 +79,7 @@ defmodule Ymlr.MixProject do
       files: ["lib", "mix.exs", "README*", "LICENSE*", "CHANGELOG.md"]
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test_support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
