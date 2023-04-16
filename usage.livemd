@@ -77,6 +77,8 @@ Generated yaml_elixir app
 
 ## Encoding a single document
 
+[![Run in Livebook](https://livebook.dev/badge/v1/pink.svg)](https://livebook.dev/run?url=https%3A%2F%2Fgithub.com%2Fufirstgroup%2Fymlr%2Fblob%2Fmain%2Fusage.livemd)
+
 Note: We defined document data as variables `full`, `simple_1` and `simple_2` in the setup block at the top of this livebook.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
