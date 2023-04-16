@@ -18,6 +18,10 @@ for further information.**
 
 * A protocol based implementation was added which give more freedom to users of this library - [#118](https://github.com/ufirstgroup/ymlr/pull/118)
 
+### Added
+
+* Adds an option `atoms` to encode atom map keys with a leading colon. 
+
 <!-- Add your changelog entry to the relevant subsection -->
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->

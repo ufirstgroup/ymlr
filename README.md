@@ -32,40 +32,57 @@ See The usage livebook `usage.livemd` for more detailed examples.
 ### Encode a single document - optionally with comments:
 
 ```elixir
-    iex> Ymlr.document!(%{a: 1})
-    """
-    ---
-    a: 1
-    """
+  iex> Ymlr.document!(%{a: 1})
+  """
+  ---
+  a: 1
+  """
 
-    iex> Ymlr.document!({"comment", %{a: 1}})
-    """
-    ---
-    # comment
-    a: 1
-    """
+  iex> Ymlr.document!({"comment", %{a: 1}})
+  """
+  ---
+  # comment
+  a: 1
+  """
 
-    iex> Ymlr.document!({["comment 1", "comment 2"], %{"a" => "a", "b" => :b, "c" => "true", "d" => "100"}})
-    """
-    ---
-    # comment 1
-    # comment 2
-    a: a
-    b: b
-    c: 'true'
-    d: '100'
-    """
+  iex> Ymlr.document!({["comment 1", "comment 2"], %{"a" => "a", "b" => :b, "c" => "true", "d" => "100"}})
+  """
+  ---
+  # comment 1
+  # comment 2
+  a: a
+  b: b
+  c: 'true'
+  d: '100'
+  """
 ```
 
 ### Encode a multiple documents
 
 ```elixir
-    iex> Ymlr.documents!([%{a: 1}, %{b: 2}])
-    """
-    ---
-    a: 1
+iex> Ymlr.documents!([%{a: 1}, %{b: 2}])
+"""
+---
+a: 1
 
-    ---
-    b: 2
-    """
+---
+b: 2
+"""
+```
+
+## Support for atoms
+
+By default, atoms as map keys are encoded as strings (without the leading
+colon). If you want atoms to be encoded with a leading colon in order to be able
+to parse it later using [`YamlElixir`'s `atoms`
+option](https://hexdocs.pm/yaml_elixir/readme.html#support-for-atoms), you can
+pass `atoms: true` as second argument to any of the `Ymlr` module's functions:
+
+
+```elixir
+iex> Ymlr.document!(%{a: 1}, atoms: true)
+"""
+---
+:a: 1
+"""
 ```
