@@ -6,7 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
-
 ### Breaking Change
 
 **Up to and including version 3.x, `ymlr` would encode structs out of the box.
@@ -20,7 +19,8 @@ for further information.**
 
 ### Added
 
-* Adds an option `atoms` to encode atom map keys with a leading colon. 
+* Adds an option `atoms` to encode atom map keys with a leading colon.
+* Tuples are now encoded as lists.
 
 <!-- Add your changelog entry to the relevant subsection -->
 
