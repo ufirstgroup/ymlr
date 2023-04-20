@@ -1,5 +1,5 @@
 defprotocol Ymlr.Encoder do
-  @moduledoc """
+  @moduledoc ~S"""
   Protocol controlling how a value is encoded to YAML.
 
   ## Deriving
@@ -8,7 +8,9 @@ defprotocol Ymlr.Encoder do
   protocol implementation in trivial cases. Accepted options are:
 
     * `:only` - encodes only values of specified keys.
-    * `:except` - encodes all struct fields except specified keys.
+    * `:except` - If set to a list of fields, all struct fields except specified
+      keys are encoded. If set to `:defaults`, all fields are encoded, except
+      the ones equaling their default value as defined in the struct.
 
   By default all keys except the `:__struct__` key are encoded.
 
@@ -80,6 +82,23 @@ defprotocol Ymlr.Encoder do
     end
   end
   ```
+
+  We can exclude the fields being left at their defaults by passing `except:
+  :defaults`:
+
+  ```
+  defmodule TestExceptDefaults do
+    @derive {Ymlr.Encoder, except: :defaults}
+    defstruct [:foo, bar: 1, baz: :ok]
+  end
+  ```
+
+  This would generate an implementation similar to the following:
+
+  ```
+  iex> Ymlr.document!(%TestExceptDefaults{foo: 1, bar: 1, baz: :error})
+  "baz: error\nfoo: 1"
+  ```
   """
 
   @fallback_to_any true
@@ -95,14 +114,31 @@ end
 
 defimpl Ymlr.Encoder, for: Any do
   defmacro __deriving__(module, struct, opts) do
-    fields = fields_to_encode(struct, opts)
+    if opts[:except] === :defaults do
+      quote do
+        defimpl Ymlr.Encoder, for: unquote(module) do
+          def encode(data, idnent_level, opts) do
+            defaults = @for |> struct!() |> Map.from_struct() |> MapSet.new()
 
-    quote do
-      defimpl Ymlr.Encoder, for: unquote(module) do
-        def encode(data, idnent_level, opts) do
-          data
-          |> Map.take(unquote(fields))
-          |> Ymlr.Encode.map(idnent_level, opts)
+            data
+            |> Map.from_struct()
+            |> MapSet.new()
+            |> MapSet.difference(defaults)
+            |> Map.new()
+            |> Ymlr.Encode.map(idnent_level, opts)
+          end
+        end
+      end
+    else
+      fields = fields_to_encode(struct, opts)
+
+      quote do
+        defimpl Ymlr.Encoder, for: unquote(module) do
+          def encode(data, idnent_level, opts) do
+            data
+            |> Map.take(unquote(fields))
+            |> Ymlr.Encode.map(idnent_level, opts)
+          end
         end
       end
     end
