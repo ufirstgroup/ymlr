@@ -20,6 +20,11 @@ defmodule Ymlr.EncoderTest do
       @derive {Ymlr.Encoder, except: [:foo]}
       defstruct [:foo, :bar]
     end
+
+    defmodule TestStructDerivedExceptDefaults do
+      @derive {Ymlr.Encoder, except: :defaults}
+      defstruct [:foo, bar: 1, baz: :ok]
+    end
   end
 
   test "Raises if fields don't exist" do

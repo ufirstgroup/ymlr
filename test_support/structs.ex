@@ -16,3 +16,8 @@ defmodule TestStructDerivedExceptFoo do
   @derive {Ymlr.Encoder, except: [:foo]}
   defstruct [:foo, :bar]
 end
+
+defmodule TestStructDerivedExceptDefaults do
+  @derive {Ymlr.Encoder, except: :defaults}
+  defstruct [:foo, bar: 1, baz: :ok]
+end

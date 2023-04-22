@@ -191,6 +191,9 @@ defmodule Ymlr.EncodeTest do
       assert "bar: 2\nfoo: 1" == MUT.to_s!(%TestStructDerivedAll{foo: 1, bar: 2})
       assert "foo: 1" == MUT.to_s!(%TestStructDerivedOnlyFoo{foo: 1, bar: 2})
       assert "bar: 2" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
+
+      assert "baz: error\nfoo: 1" ==
+               MUT.to_s!(%TestStructDerivedExceptDefaults{foo: 1, bar: 1, baz: :error})
     end
 
     test "pids - not supported" do

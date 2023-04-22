@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+### Added
+
+- `Ymlr.Encoder` - Option `except: :defaults` to exclude default values
+
 <!--------------------- Don't add new entries after this line --------------------->
 
 ## [4.0.0] - 2023-04-16
@@ -23,12 +27,12 @@ for further information.**
 
 ### Changed
 
-* A protocol based implementation was added which give more freedom to users of this library - [#118](https://github.com/ufirstgroup/ymlr/pull/118)
+- A protocol based implementation was added which give more freedom to users of this library - [#118](https://github.com/ufirstgroup/ymlr/pull/118)
 
 ### Added
 
-* Adds an option `atoms` to encode atom map keys with a leading colon.
-* Tuples are now encoded as lists.
+- Adds an option `atoms` to encode atom map keys with a leading colon.
+- Tuples are now encoded as lists.
 
 ## [3.0.1] - 2022-09-05
 
