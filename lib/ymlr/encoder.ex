@@ -118,7 +118,7 @@ defimpl Ymlr.Encoder, for: Any do
       quote do
         defimpl Ymlr.Encoder, for: unquote(module) do
           def encode(data, idnent_level, opts) do
-            defaults = @for |> struct!() |> Map.from_struct() |> MapSet.new()
+            defaults = @for |> struct() |> Map.from_struct() |> MapSet.new()
 
             data
             |> Map.from_struct()

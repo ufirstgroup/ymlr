@@ -19,5 +19,6 @@ end
 
 defmodule TestStructDerivedExceptDefaults do
   @derive {Ymlr.Encoder, except: :defaults}
+  @enforce_keys [:foo]
   defstruct [:foo, bar: 1, baz: :ok]
 end
