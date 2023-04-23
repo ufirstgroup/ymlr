@@ -10,11 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+<!--------------------- Don't add new entries after this line --------------------->
+
+## [4.1.0] - 2023-04-23
+
 ### Added
 
 - `Ymlr.Encoder` - Option `except: :defaults` to exclude default values
-
-<!--------------------- Don't add new entries after this line --------------------->
 
 ## [4.0.0] - 2023-04-16
 
