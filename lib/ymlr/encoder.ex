@@ -115,15 +115,19 @@ end
 defimpl Ymlr.Encoder, for: Any do
   defmacro __deriving__(module, struct, opts) do
     if opts[:except] === :defaults do
+      defaults =
+        struct
+        |> Map.from_struct()
+        |> MapSet.new()
+        |> Macro.escape()
+
       quote do
         defimpl Ymlr.Encoder, for: unquote(module) do
           def encode(data, idnent_level, opts) do
-            defaults = @for |> struct() |> Map.from_struct() |> MapSet.new()
-
             data
             |> Map.from_struct()
             |> MapSet.new()
-            |> MapSet.difference(defaults)
+            |> MapSet.difference(unquote(defaults))
             |> Map.new()
             |> Ymlr.Encode.map(idnent_level, opts)
           end
