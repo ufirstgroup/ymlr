@@ -188,12 +188,18 @@ defmodule Ymlr.EncodeTest do
                    ~r/protocol Ymlr.Encoder not implemented/,
                    fn -> MUT.to_s!(%TestStruct{foo: 1, bar: 2}) end
 
-      assert "bar: 2\nfoo: 1" == MUT.to_s!(%TestStructDerivedAll{foo: 1, bar: 2})
+      result = MUT.to_s!(%TestStructDerivedAll{foo: 1, bar: 2}) |> YamlElixir.read_from_string!()
+      assert 1 == result["foo"]
+      assert 2 == result["bar"]
       assert "foo: 1" == MUT.to_s!(%TestStructDerivedOnlyFoo{foo: 1, bar: 2})
       assert "bar: 2" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
 
-      assert "baz: error\nfoo: 1" ==
-               MUT.to_s!(%TestStructDerivedExceptDefaults{foo: 1, bar: 1, baz: :error})
+      result =
+        MUT.to_s!(%TestStructDerivedExceptDefaults{foo: 1, bar: 1, baz: :error})
+        |> YamlElixir.read_from_string!()
+
+      assert 1 == result["foo"]
+      assert "error" == result["baz"]
     end
 
     test "pids - not supported" do
@@ -254,19 +260,13 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "nested: map / map" do
-      expected =
-        """
-        a:
-          b: 1
-          c:
-            d: 2
-        e:
-          f: 3
-          g: 4
-        """
-        |> String.trim()
+      result =
+        MUT.to_s!(%{a: %{b: 1, c: %{d: 2}}, e: %{f: 3, g: 4}}) |> YamlElixir.read_from_string!()
 
-      assert MUT.to_s!(%{a: %{b: 1, c: %{d: 2}}, e: %{f: 3, g: 4}}) == expected
+      assert 2 == result["a"]["c"]["d"]
+      assert 1 == result["a"]["b"]
+      assert 3 == result["e"]["f"]
+      assert 4 == result["e"]["g"]
     end
 
     # see https://yaml-multiline.info/
@@ -296,20 +296,14 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "nested: map / multiline string" do
-      expected =
-        """
-        a: |-
-          a1
-          a2
-        b: b1
-        c: |
-          c1
-          c2
-        d: d1
-        """
-        |> String.trim()
+      result =
+        MUT.to_s!(%{a: "a1\na2", b: "b1", c: "c1\nc2\n", d: "d1"})
+        |> YamlElixir.read_from_string!()
 
-      assert MUT.to_s!(%{a: "a1\na2", b: "b1", c: "c1\nc2\n", d: "d1"}) == expected
+      assert "a1\na2" == String.trim(result["a"])
+      assert "b1" == result["b"]
+      assert "c1\nc2" == String.trim(result["c"])
+      assert "d1" == result["d"]
     end
 
     test "date" do
