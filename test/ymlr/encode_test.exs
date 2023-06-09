@@ -188,11 +188,11 @@ defmodule Ymlr.EncodeTest do
                    ~r/protocol Ymlr.Encoder not implemented/,
                    fn -> MUT.to_s!(%TestStruct{foo: 1, bar: 2}) end
 
-      assert "foo: 1\nbar: 2" == MUT.to_s!(%TestStructDerivedAll{foo: 1, bar: 2})
+      assert "bar: 2\nfoo: 1" == MUT.to_s!(%TestStructDerivedAll{foo: 1, bar: 2})
       assert "foo: 1" == MUT.to_s!(%TestStructDerivedOnlyFoo{foo: 1, bar: 2})
       assert "bar: 2" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
 
-      assert "foo: 1\nbaz: error" ==
+      assert "baz: error\nfoo: 1" ==
                MUT.to_s!(%TestStructDerivedExceptDefaults{foo: 1, bar: 1, baz: :error})
     end
 
@@ -257,9 +257,9 @@ defmodule Ymlr.EncodeTest do
       expected =
         """
         a:
+          b: 1
           c:
             d: 2
-          b: 1
         e:
           f: 3
           g: 4
@@ -298,14 +298,14 @@ defmodule Ymlr.EncodeTest do
     test "nested: map / multiline string" do
       expected =
         """
-        c: |
-          c1
-          c2
         a: |-
           a1
           a2
-        d: d1
         b: b1
+        c: |
+          c1
+          c2
+        d: d1
         """
         |> String.trim()
 
