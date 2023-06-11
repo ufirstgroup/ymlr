@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         elixir: [1.14.x]
-        otp: [25.x]
+        otp: [26.x]
     name: Check Code Quality
     steps:
       - uses: actions/checkout@v3
