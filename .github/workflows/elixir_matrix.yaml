@@ -34,8 +34,6 @@ jobs:
             otp: "25.x"
           - elixir: "1.12.x"
             otp: "25.x"
-          - elixir: "1.13.x"
-            otp: "25.x"
           # OTP 26
           - elixir: "1.10.x"
             otp: "26.x"
@@ -44,11 +42,6 @@ jobs:
           - elixir: "1.12.x"
             otp: "26.x"
           - elixir: "1.13.x"
-            otp: "26.x"
-        include:
-          - elixir: "1.13.4"
-            otp: "25.x"
-          - elixir: "1.14.5"
             otp: "26.x"
     steps:
       - uses: actions/checkout@v3.5.3
