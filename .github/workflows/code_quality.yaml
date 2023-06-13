@@ -25,6 +25,8 @@ jobs:
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
+          install-rebar: true
+          install-hex: true
 
       - name: Retrieve Build Cache
         uses: actions/cache@v3
@@ -53,10 +55,7 @@ jobs:
             priv/plts
 
       - name: Install Mix Dependencies
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get
+        run: mix deps.get
 
       - name: Check Formatting
         run: mix format --check-formatted

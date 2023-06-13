@@ -51,6 +51,8 @@ jobs:
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
+          install-rebar: true
+          install-hex: true
 
       - name: Retrieve Build Cache
         uses: actions/cache@v3
@@ -66,8 +68,6 @@ jobs:
           path: deps
           key: ${{runner.os}}-${{steps.beam.outputs.otp-version}}-${{steps.beam.outputs.elixir-version}}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
 
-      - run: mix local.rebar --force
-      - run: mix local.hex --force
       - run: mix deps.get
       - run: mix compile --warnings-as-errors
       - run: mix test
