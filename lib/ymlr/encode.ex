@@ -158,6 +158,7 @@ defmodule Ymlr.Encode do
       String.at(data, -1) in @quote_when_last -> with_quotes(data)
       String.starts_with?(data, "- ") -> with_quotes(data)
       String.starts_with?(data, ": ") -> with_quotes(data)
+      String.starts_with?(data, ":{") -> with_quotes(data)
       String.starts_with?(data, "? ") -> with_quotes(data)
       String.contains?(data, " #") -> with_quotes(data)
       String.contains?(data, ": ") -> with_quotes(data)
