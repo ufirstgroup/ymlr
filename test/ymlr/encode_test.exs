@@ -53,6 +53,7 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!("? explicit mapping key") == ~S('? explicit mapping key')
       assert MUT.to_s!("{flow_mapping") == ~S('{flow_mapping')
       assert MUT.to_s!("}flow_mapping") == ~S('}flow_mapping')
+      assert MUT.to_s!(":{ block flow") == ~S(':{ block flow')
       assert MUT.to_s!("[sequence_mapping") == ~S('[sequence_mapping')
       assert MUT.to_s!("]sequence_mapping") == ~S(']sequence_mapping')
 
