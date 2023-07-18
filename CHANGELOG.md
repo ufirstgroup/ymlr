@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Adds an option `sort_maps` to encode map with entries sorted.
 - Quote values beginning with `:{`
 
 <!--------------------- Don't add new entries after this line --------------------->

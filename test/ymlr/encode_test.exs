@@ -171,6 +171,10 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!(%{a: nil}, atoms: true) == ":a:"
     end
 
+    test "maps with sort_maps: true" do
+      assert MUT.to_s!(Map.new(1..33, &{&1, &1}), sort_maps: true) |> String.starts_with?("1: 1")
+    end
+
     test "invalid map key" do
       assert_raise ArgumentError, fn ->
         MUT.to_s!(%{%{a: 1} => 2})
