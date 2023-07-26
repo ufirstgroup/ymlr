@@ -17,6 +17,7 @@ defmodule Ymlr do
   ## Options
 
   * `atoms` - when set to `true`, encodes atom map keys with a leading colon.
+  * `sort_maps` - when set to `true`, sorts map by key-values.
 
   ## Examples
 
@@ -31,6 +32,9 @@ defmodule Ymlr do
 
       iex> Ymlr.document!({["comment 1", "comment 2"], %{a: 1}})
       "---\n# comment 1\n# comment 2\na: 1\n"
+
+      iex> Ymlr.document!(Map.new(1..33, &{&1, &1}), sort_maps: true)
+      "---\n1: 1\n2: 2\n3: 3\n4: 4\n5: 5\n6: 6\n7: 7\n8: 8\n9: 9\n10: 10\n11: 11\n12: 12\n13: 13\n14: 14\n15: 15\n16: 16\n17: 17\n18: 18\n19: 19\n20: 20\n21: 21\n22: 22\n23: 23\n24: 24\n25: 25\n26: 26\n27: 27\n28: 28\n29: 29\n30: 30\n31: 31\n32: 32\n33: 33\n"
   """
   @spec document!(document, opts :: Keyword.t()) :: binary()
   def document!(document, opts \\ [])
@@ -54,6 +58,7 @@ defmodule Ymlr do
   ## Options
 
   * `atoms` - when set to `true`, encodes atom map keys with a leading colon.
+  * `sort_maps` - when set to `true`, sorts map by key-values.
 
   ## Examples
 
@@ -68,6 +73,9 @@ defmodule Ymlr do
 
       iex> Ymlr.document({["comment 1", "comment 2"], %{a: 1}})
       {:ok, "---\n# comment 1\n# comment 2\na: 1\n"}
+
+      iex> Ymlr.document(Map.new(1..33, &{&1, &1}), sort_maps: true)
+      {:ok, "---\n1: 1\n2: 2\n3: 3\n4: 4\n5: 5\n6: 6\n7: 7\n8: 8\n9: 9\n10: 10\n11: 11\n12: 12\n13: 13\n14: 14\n15: 15\n16: 16\n17: 17\n18: 18\n19: 19\n20: 20\n21: 21\n22: 22\n23: 23\n24: 24\n25: 25\n26: 26\n27: 27\n28: 28\n29: 29\n30: 30\n31: 31\n32: 32\n33: 33\n"}
   """
   @spec document(document, opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
   def document(document, opts \\ []) do
@@ -83,6 +91,7 @@ defmodule Ymlr do
   ## Options
 
   * `atoms` - when set to `true`, encodes atom map keys with a leading colon.
+  * `sort_maps` - when set to `true`, sorts map by key-values.
 
   ## Examples
 
@@ -116,6 +125,7 @@ defmodule Ymlr do
   ## Options
 
   * `atoms` - when set to `true`, encodes atom map keys with a leading colon.
+  * `sort_maps` - when set to `true`, sorts map by key-values.
 
   ## Examples
 

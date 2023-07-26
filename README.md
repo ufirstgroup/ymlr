@@ -86,3 +86,29 @@ iex> Ymlr.document!(%{a: 1}, atoms: true)
 :a: 1
 """
 ```
+
+### Encode maps with keys sorted
+Maps in elixir, implemented by erlang `:maps`, internally are `flatmap`s or `hashmap`s by size.
+Large maps will be encoded in strange order.
+
+```elixir
+iex> 1..33 |> Map.new(&{&1, &1})|> Ymlr.document!() |> IO.puts
+---
+4: 4
+25: 25
+8: 8
+...
+
+```
+
+By using `:sort_maps` option, ymlr will encode all entries sorted.
+
+```elixir
+iex> 1..33 |> Map.new(&{&1, &1})|> Ymlr.document!(sort_maps: true) |> IO.puts
+---
+1: 1
+2: 2
+3: 3
+...
+
+```
