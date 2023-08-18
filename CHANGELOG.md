@@ -16,8 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Adds an option `sort_maps` to encode map with entries sorted.
-- Quote values beginning with `:{`
+- Adds an option `sort_maps` to encode map with entries sorted - [#139](https://github.com/ufirstgroup/ymlr/issues/139),[#144](https://github.com/ufirstgroup/ymlr/pull/144)
+- Quote values beginning with `:{` - [#140](https://github.com/ufirstgroup/ymlr/issues/140),[#141](https://github.com/ufirstgroup/ymlr/pull/141)
 
 ## [4.1.0] - 2023-04-23
 
