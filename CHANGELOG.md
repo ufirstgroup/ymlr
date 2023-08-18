@@ -10,12 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+<!--------------------- Don't add new entries after this line --------------------->
+
+## [4.2.0] - 2023-08-18
+
 ### Added
 
 - Adds an option `sort_maps` to encode map with entries sorted.
 - Quote values beginning with `:{`
-
-<!--------------------- Don't add new entries after this line --------------------->
 
 ## [4.1.0] - 2023-04-23
 
