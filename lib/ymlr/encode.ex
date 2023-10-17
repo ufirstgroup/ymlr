@@ -199,18 +199,39 @@ defmodule Ymlr.Encode do
 
   # for example for map keys
   defp multiline(data, nil), do: inspect(data)
+  # for plain string (level == 0) we need to indent at least 1 time
+  defp multiline(data, 0), do: multiline(data, 1)
   # see https://yaml-multiline.info/
   defp multiline(data, level) do
     indentation = indent(level)
 
-    block =
-      data |> String.replace("\n", IO.iodata_to_binary(indentation))
+    # B: block indicator
+    # N: newline
+    # I: indentation
+    # indent(level) returns [N, I]
+    # after String.split(data, "\n"):
+    # ["a", "", "c"]           -> [B, N, I, "a", N,          N, I, "c"]
+    # ["a", " b", "c"]         -> [B, N, I, "a", N, I, " b", N, I, "c"]
+    # ["a", " b", "c", ""]     -> [B, N, I, "a", N, I, " b", N, I, "c", N]
+    # ["a", " b", "c", "", ""] -> [B, N, I, "a", N, I, " b", N, I, "c", N, N]
 
-    [block_chomping_indicator(data) | [indentation | block]]
+    block =
+      data
+      |> String.split("\n")
+      |> Enum.map(fn
+        "" -> "\n"
+        str -> [indentation, str]
+      end)
+
+    [block_chomping_indicator(block) | block]
   end
 
-  defp block_chomping_indicator(data) do
-    if String.ends_with?(data, "\n"), do: "|", else: "|-"
+  defp block_chomping_indicator(block) do
+    case Enum.reverse(block) do
+      ["\n", "\n" | _] -> "|+"
+      ["\n" | _] -> "|"
+      _ -> "|-"
+    end
   end
 
   defp indent(level) do
