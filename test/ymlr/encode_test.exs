@@ -335,8 +335,6 @@ defmodule Ymlr.EncodeTest do
     # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
     test "multiline strings - mix spaces and tabs" do
       given = %{"block" => "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"}
-      encoded = MUT.to_s!(given)
-
       expected =
         """
         block: |
@@ -345,13 +343,11 @@ defmodule Ymlr.EncodeTest do
           }
         """
 
-      assert YamlElixir.read_from_string!(encoded) == given
-      # assert encoded == expected
-      assert encoded == expected <> "  "
+      assert_encode(given, expected)
     end
 
     test "nested: list / multiline string" do
-      assert_encode(["a\nb\n", "c"], "- |\n  a\n  b\n  \n- c")
+      assert_encode(["a\nb\n", "c"], "- |\n  a\n  b\n- c")
     end
 
     test "nested: map / multiline string" do
