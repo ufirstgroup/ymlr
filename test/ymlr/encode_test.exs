@@ -280,9 +280,44 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!("hello\nworld\n") == "|\nhello\nworld"
     end
 
+    test "newline only string - encoding" do
+      given = "\n"
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+      assert encoded == ~S("\n")
+    end
+
+    test "newline only string - in list" do
+      given = ["\n"]
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+      assert encoded == ~S(- "\n")
+
+      given = [1, "\n"]
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+
+      given = ["\n", 2]
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+
+      given = [1, "\n", 3]
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+      assert encoded == ~s(- 1\n- "\\n"\n- 3)
+    end
+
+    test "newline only string - in map" do
+      given = %{"a" => "\n"}
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+      assert encoded == ~S(a: "\n")
+    end
+
     # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
     test "multiline strings - mix spaces and tabs" do
-      given = "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"
+      given = %{"block" => "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"}
+      encoded = MUT.to_s!(given)
 
       expected =
         """
@@ -291,24 +326,25 @@ defmodule Ymlr.EncodeTest do
           \tprintf("Hello, world!\\n");
           }
         """
-        |> String.trim()
 
-      assert MUT.to_s!(%{block: given}) == expected
+      # not working yet => TODO better handling of terminal newlines
+      # assert YamlElixir.read_from_string!(encoded) == given
+      # assert encoded == expected
+      assert encoded == String.trim(expected)
     end
 
     test "nested: list / multiline string" do
-      assert MUT.to_s!(["a\nb\n", "c"]) == "- |\n  a\n  b\n- c"
+      given = ["a\nb\n", "c"]
+      encoded = MUT.to_s!(given)
+
+      assert encoded == "- |\n  a\n  b\n- c"
     end
 
     test "nested: map / multiline string" do
-      result =
-        MUT.to_s!(%{a: "a1\na2", b: "b1", c: "c1\nc2\n", d: "d1"})
-        |> YamlElixir.read_from_string!()
+      given = %{"a" => "a1\na2", "b" => "b1", "c" => "c1\nc2\n", "d" => "d1", "nl" => "\n"}
+      encoded = MUT.to_s!(given)
 
-      assert "a1\na2" == String.trim(result["a"])
-      assert "b1" == result["b"]
-      assert "c1\nc2" == String.trim(result["c"])
-      assert "d1" == result["d"]
+      assert YamlElixir.read_from_string!(encoded) == given
     end
 
     test "date" do
