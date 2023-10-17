@@ -292,7 +292,7 @@ defmodule Ymlr.EncodeTest do
     # see https://yaml-multiline.info/
     test "multiline strings" do
       assert_encode("hello\nworld", "|-\nhello\nworld")
-      assert_encode("hello\nworld\n", "|\nhello\nworld")
+      assert_encode("hello\nworld\n", "|\nhello\nworld\n")
     end
 
     test "newline only string - encoding" do
@@ -343,16 +343,13 @@ defmodule Ymlr.EncodeTest do
         """
 
       # not working yet => TODO better handling of terminal newlines
-      # assert YamlElixir.read_from_string!(encoded) == given
+      assert YamlElixir.read_from_string!(encoded) == given
       # assert encoded == expected
-      assert encoded == String.trim(expected)
+      assert encoded == expected <> "  "
     end
 
     test "nested: list / multiline string" do
-      given = ["a\nb\n", "c"]
-      encoded = MUT.to_s!(given)
-
-      assert encoded == "- |\n  a\n  b\n- c"
+      assert_encode(["a\nb\n", "c"], "- |\n  a\n  b\n  \n- c")
     end
 
     test "nested: map / multiline string" do
