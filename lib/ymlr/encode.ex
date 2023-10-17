@@ -107,6 +107,8 @@ defmodule Ymlr.Encode do
   end
 
   @spec list(data :: list(), indent_level :: integer, opts :: Encoder.opts()) :: iodata()
+  def list([], _, _), do: "[]"
+
   def list(data, indent_level, opts) do
     indentation = indent(indent_level)
 

@@ -157,7 +157,7 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "lists" do
-      assert_encode([], "")
+      assert_encode([], "[]")
       assert_encode([1], "- 1")
       assert_encode([""], ~s(- ""))
       assert_encode([1, nil, 2], "- 1\n-\n- 2")
