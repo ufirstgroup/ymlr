@@ -144,6 +144,7 @@ defmodule Ymlr.Encode do
   defp encode_binary(data, indent_level) do
     cond do
       data == "" -> ~S('')
+      data == "\n" -> ~S("\n")
       data == "null" -> ~S('null')
       data == "yes" -> ~S('yes')
       data == "no" -> ~S('no')
@@ -186,7 +187,7 @@ defmodule Ymlr.Encode do
     if String.contains?(data, "'") do
       ~s("#{escape(data)}")
     else
-      ~s('#{String.replace(data, ~s('), ~s(''))}')
+      ~s('#{data}')
     end
   end
 
@@ -201,7 +202,7 @@ defmodule Ymlr.Encode do
     indentation = indent(level)
 
     block =
-      data |> String.replace("\n", IO.iodata_to_binary(indentation))
+      data |> String.trim_trailing("\n") |> String.replace("\n", IO.iodata_to_binary(indentation))
 
     [block_chomping_indicator(data) | [indentation | block]]
   end
