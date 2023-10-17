@@ -293,48 +293,88 @@ defmodule Ymlr.EncodeTest do
     end
 
     # see https://yaml-multiline.info/
-    test "multiline strings" do
-      assert_encode("hello\nworld", "|-\nhello\nworld")
-      assert_encode("hello\nworld\n", "|\nhello\nworld\n")
+
+    test "multiline strings - base cases" do
+      # to be discussed:
+      # YamlElixir is ok with "|-\na\n b\nc" i.e. treats it the same as "|-\n a\n  b\n c" or "|-\n  a\n   b\n  c"
+      # but https://yaml-online-parser.appspot.com/ is not
+      assert_encode("a\n b\nc", "|-\n  a\n   b\n  c")
+      # also possible:           "|\n  a\n   b\n  c"
+      # also possible:          "|+\n  a\n   b\n  c"
+
+      # to be discussed: should we try to use (single or double) quotes in this case?
+      # (support editor with trim trailing whitespaces)
+      assert_encode("a\n b\nc\n ", "|-\n  a\n   b\n  c\n   ")
+      # also possible:              "|\n  a\n   b\n  c\n   "
+      # also possible:             "|+\n  a\n   b\n  c\n   "
+
+      assert_encode("a\n b\nc\n", "|\n  a\n   b\n  c\n")
+      # also possible:           "|+\n  a\n   b\n  c\n"
+    end
+
+    test "multiline strings - with multiple consecutive newlines" do
+      # to be discussed (same as above: indentation)
+      assert_encode("a\n\nb", "|-\n  a\n\n  b")
+    end
+
+    test "multiline strings - with multiple terminal newlines" do
+      # to be discussed (same as above: indentation)
+      assert_encode("a\n\n", "|+\n  a\n\n")
+      assert_encode("a\n b\nc\n\n", "|+\n  a\n   b\n  c\n\n")
+      # just to be sure ... also check with 3 newlines
+      assert_encode("a\n\n\n", "|+\n  a\n\n\n")
+    end
+
+    test "multiline strings - indented - base cases" do
+      assert_encode(["a\n b\nc"], "- |-\n  a\n   b\n  c")
+      assert_encode(["a\n b\nc\n "], "- |-\n  a\n   b\n  c\n   ")
+      assert_encode(["a\n b\nc\n"], "- |\n  a\n   b\n  c\n")
+    end
+
+    test "multiline strings - indented - with multiple consecutive newlines" do
+      assert_encode(["a\n\nb"], "- |-\n  a\n\n  b")
+      # also possible:          "- |-\n  a\n  \n  b"
+    end
+
+    test "multiline strings - indented - with multiple trailing newlines" do
+      assert_encode(["a\n\n"], "- |+\n  a\n\n")
+      assert_encode(["a\n b\nc\n\n"], "- |+\n  a\n   b\n  c\n\n")
+    end
+
+    test "multiline strings - nested - inside vs last" do
+      # if we join the strings in the list with \n we end up with an extra newline in between
+      # i.e.                            "- |+\n  a\n\n\n- |+\n  b\n\n"
+      assert_encode(["a\n\n", "b\n\n"], "- |+\n  a\n\n- |+\n  b\n\n")
+
+      # same with maps
+      assert_encode(%{k1: "a\n\n", k2: "b\n\n"}, "k1: |+\n  a\n\nk2: |+\n  b\n\n")
+
+      # just to be sure ... also check with 3 newlines
+      assert_encode(["a\n\n\n"], "- |+\n  a\n\n\n")
+      assert_encode(["a\n\n\n", "b"], "- |+\n  a\n\n\n- b")
+
+      # and what about nested lists? => see test "nested: list / list / multiline string"
     end
 
     test "newline only string - encoding" do
-      given = "\n"
-      encoded = MUT.to_s!(given)
-      assert given == YamlElixir.read_from_string!(encoded)
-      assert encoded == ~S("\n")
+      assert_encode("\n", ~S("\n"))
     end
 
     test "newline only string - in list" do
-      given = ["\n"]
-      encoded = MUT.to_s!(given)
-      assert given == YamlElixir.read_from_string!(encoded)
-      assert encoded == ~S(- "\n")
-
-      given = [1, "\n"]
-      encoded = MUT.to_s!(given)
-      assert given == YamlElixir.read_from_string!(encoded)
-
-      given = ["\n", 2]
-      encoded = MUT.to_s!(given)
-      assert given == YamlElixir.read_from_string!(encoded)
-
-      given = [1, "\n", 3]
-      encoded = MUT.to_s!(given)
-      assert given == YamlElixir.read_from_string!(encoded)
-      assert encoded == ~s(- 1\n- "\\n"\n- 3)
+      assert_encode(["\n"], ~S(- "\n"))
+      assert_encode([1, "\n"])
+      assert_encode(["\n", 2])
+      assert_encode([1, "\n", 3], ~s(- 1\n- "\\n"\n- 3))
     end
 
     test "newline only string - in map" do
-      given = %{"a" => "\n"}
-      encoded = MUT.to_s!(given)
-      assert given == YamlElixir.read_from_string!(encoded)
-      assert encoded == ~S(a: "\n")
+      assert_encode(%{"a" => "\n"}, ~S(a: "\n"))
     end
 
     # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
     test "multiline strings - mix spaces and tabs" do
       given = %{"block" => "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"}
+
       expected =
         """
         block: |
@@ -348,13 +388,57 @@ defmodule Ymlr.EncodeTest do
 
     test "nested: list / multiline string" do
       assert_encode(["a\nb\n", "c"], "- |\n  a\n  b\n- c")
+
+      assert_encode([
+        "a",
+        "b\nc",
+        "f\ng\n\n",
+        "j\n\nk\n",
+        "l\n\nm\n\n",
+        "bo\np ",
+        "q\nr\n ",
+        "s\nt\n\n ",
+        "u"
+      ])
+    end
+
+    test "nested: list / list / multiline string - multiple trailing newlines" do
+      given = [
+        ["a\n\n", "b\n\n"],
+        ["c\n\n", "d\n\n"]
+      ]
+
+      expected =
+        """
+        - - |+
+            a
+
+          - |+
+            b
+
+        - - |+
+            c
+
+          - |+
+            d
+
+        """
+
+      assert_encode(given, expected)
     end
 
     test "nested: map / multiline string" do
-      given = %{"a" => "a1\na2", "b" => "b1", "c" => "c1\nc2\n", "d" => "d1", "nl" => "\n"}
-      encoded = MUT.to_s!(given)
-
-      assert YamlElixir.read_from_string!(encoded) == given
+      assert_encode(%{
+        "a" => "a1",
+        "c" => "c1\nc2\n",
+        "d" => "d1\nd2\n\n",
+        "e" => "e1\n\ne2",
+        "f" => "f1\n\nf2\n",
+        "g" => "g1\n\ng2\n\n",
+        "h" => "",
+        "i" => "\n",
+        "j" => "\n\n"
+      })
     end
 
     test "date" do
