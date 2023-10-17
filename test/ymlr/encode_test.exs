@@ -326,9 +326,11 @@ defmodule Ymlr.EncodeTest do
           \tprintf("Hello, world!\\n");
           }
         """
-        |> String.trim()
 
-      assert encoded == expected
+      # not working yet => TODO better handling of terminal newlines
+      # assert YamlElixir.read_from_string!(encoded) == given
+      # assert encoded == expected
+      assert encoded == String.trim(expected)
     end
 
     test "nested: list / multiline string" do
