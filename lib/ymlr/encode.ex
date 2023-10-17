@@ -144,6 +144,7 @@ defmodule Ymlr.Encode do
   defp encode_binary(data, indent_level) do
     cond do
       data == "" -> ~S('')
+      data == "\n" -> ~S("\n")
       data == "null" -> ~S('null')
       data == "yes" -> ~S('yes')
       data == "no" -> ~S('no')
