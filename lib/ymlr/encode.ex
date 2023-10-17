@@ -186,7 +186,7 @@ defmodule Ymlr.Encode do
     if String.contains?(data, "'") do
       ~s("#{escape(data)}")
     else
-      ~s('#{data}')
+      ~s('#{String.replace(data, ~s('), ~s(''))}')
     end
   end
 
@@ -201,7 +201,7 @@ defmodule Ymlr.Encode do
     indentation = indent(level)
 
     block =
-      data |> String.trim_trailing("\n") |> String.replace("\n", IO.iodata_to_binary(indentation))
+      data |> String.replace("\n", IO.iodata_to_binary(indentation))
 
     [block_chomping_indicator(data) | [indentation | block]]
   end

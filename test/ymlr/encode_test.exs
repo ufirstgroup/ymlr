@@ -87,7 +87,8 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!("{}") == ~S('{}')
       assert MUT.to_s!("[{}]") == ~S('[{}]')
       # ... (use double quotes if string contains single quotes)
-      assert MUT.to_s!(~S(["I don't know!\nRea|\y?"])) == ~S("[\"I don't know!\\nRea|\\y?\"]")
+      input = ~S(["I don't know!\nRea|\y?"])
+      assert input |> MUT.to_s!() |> YamlElixir.read_from_string!() == input
     end
 
     test "quoted strings - in map key" do
@@ -276,28 +277,33 @@ defmodule Ymlr.EncodeTest do
 
     # see https://yaml-multiline.info/
     test "multiline strings" do
-      assert MUT.to_s!("hello\nworld") == "|-\nhello\nworld"
-      assert MUT.to_s!("hello\nworld\n") == "|\nhello\nworld"
+      no_newline_at_end = "hello\nworld"
+
+      assert no_newline_at_end |> MUT.to_s!() |> YamlElixir.read_from_string!() ==
+               no_newline_at_end
+
+      newline_at_end = "hello\nworld\n"
+
+      assert newline_at_end |> MUT.to_s!() |> YamlElixir.read_from_string!() ==
+               newline_at_end
+
+      newline = "\n"
+
+      assert newline_at_end |> MUT.to_s!() |> YamlElixir.read_from_string!() ==
+               newline_at_end
     end
 
     # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
     test "multiline strings - mix spaces and tabs" do
       given = "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"
 
-      expected =
-        """
-        block: |
-          void main() {
-          \tprintf("Hello, world!\\n");
-          }
-        """
-        |> String.trim()
-
-      assert MUT.to_s!(%{block: given}) == expected
+      assert MUT.to_s!(given) |> YamlElixir.read_from_string!() == given
     end
 
     test "nested: list / multiline string" do
-      assert MUT.to_s!(["a\nb\n", "c"]) == "- |\n  a\n  b\n- c"
+      input = ["a\nb\n", "c"]
+      assert MUT.to_s!(input) == "- |\n  a\n  b\n  \n- c"
+      assert input |> MUT.to_s!() |> YamlElixir.read_from_string!() == input
     end
 
     test "nested: map / multiline string" do
