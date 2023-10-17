@@ -282,7 +282,8 @@ defmodule Ymlr.EncodeTest do
 
     # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
     test "multiline strings - mix spaces and tabs" do
-      given = "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"
+      given = %{"block" => "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"}
+      encoded = MUT.to_s!(given)
 
       expected =
         """
@@ -293,22 +294,21 @@ defmodule Ymlr.EncodeTest do
         """
         |> String.trim()
 
-      assert MUT.to_s!(%{block: given}) == expected
+      assert encoded == expected
     end
 
     test "nested: list / multiline string" do
-      assert MUT.to_s!(["a\nb\n", "c"]) == "- |\n  a\n  b\n- c"
+      given = ["a\nb\n", "c"]
+      encoded = MUT.to_s!(given)
+
+      assert encoded == "- |\n  a\n  b\n- c"
     end
 
     test "nested: map / multiline string" do
-      result =
-        MUT.to_s!(%{a: "a1\na2", b: "b1", c: "c1\nc2\n", d: "d1"})
-        |> YamlElixir.read_from_string!()
+      given = %{"a" => "a1\na2", "b" => "b1", "c" => "c1\nc2\n", "d" => "d1"}
+      encoded = MUT.to_s!(given)
 
-      assert "a1\na2" == String.trim(result["a"])
-      assert "b1" == result["b"]
-      assert "c1\nc2" == String.trim(result["c"])
-      assert "d1" == result["d"]
+      assert YamlElixir.read_from_string!(encoded) == given
     end
 
     test "date" do
