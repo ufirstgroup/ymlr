@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - handle "\n" strings - [#157](https://github.com/ufirstgroup/ymlr/issues/157),[#159](https://github.com/ufirstgroup/ymlr/pull/159)
+- handle empty list - [#163](https://github.com/ufirstgroup/ymlr/pull/163)
 
 <!--------------------- Don't add new entries after this line --------------------->
 
