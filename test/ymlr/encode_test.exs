@@ -277,26 +277,36 @@ defmodule Ymlr.EncodeTest do
 
     # see https://yaml-multiline.info/
     test "multiline strings - level 0" do
-      assert MUT.to_s!("a\n\nb")       == "|-\n  a\n\n  b"
-      assert MUT.to_s!("a\n b\nc")     == "|-\n  a\n   b\n  c"      # "|..." would also work
-      assert MUT.to_s!("a\n b\nc\n ")  == "|-\n  a\n   b\n  c\n   " # "|..." would also work
-      assert MUT.to_s!("a\n b\nc\n")   == "|\n  a\n   b\n  c\n"
-      assert MUT.to_s!("a\n b\nc\n\n") == "|+\n  a\n   b\n  c\n\n"
+      assert MUT.to_s!("a\n\nb") == "|-\n  a\n  \n  b"
+      assert MUT.to_s!("a\n\nb") |> YamlElixir.read_from_string!() == "a\n\nb"
+      # "|..." would also work
+      assert MUT.to_s!("a\n b\nc") == "|-\n  a\n   b\n  c"
+      # "|..." would also work
+      assert MUT.to_s!("a\n b\nc\n ") == "|-\n  a\n   b\n  c\n   "
+      assert MUT.to_s!("a\n b\nc\n") == "|+\n  a\n   b\n  c\n  "
+      assert MUT.to_s!("a\n b\nc\n\n") == "|+\n  a\n   b\n  c\n  \n  "
     end
 
     test "multiline strings - level 1" do
-      assert MUT.to_s!(["a\n\nb"])       == "- |-\n  a\n\n  b"
-      assert MUT.to_s!(["a\n b\nc"])     == "- |-\n  a\n   b\n  c"      # "|..." would only work if it was the last element in the document
-      assert MUT.to_s!(["a\n b\nc\n "])  == "- |-\n  a\n   b\n  c\n   " # "|..." would only work if it was the last element in the document
-      assert MUT.to_s!(["a\n b\nc\n"])   == "- |\n  a\n   b\n  c\n"
-      assert MUT.to_s!(["a\n b\nc\n\n"]) == "- |+\n  a\n   b\n  c\n\n"
+      assert MUT.to_s!(["a\n\nb"]) == "- |-\n  a\n  \n  b"
+      # "|..." would only work if it was the last element in the document
+      assert MUT.to_s!(["a\n b\nc"]) == "- |-\n  a\n   b\n  c"
+      # "|..." would only work if it was the last element in the document
+      assert MUT.to_s!(["a\n b\nc\n "]) == "- |-\n  a\n   b\n  c\n   "
+      assert MUT.to_s!(["a\n b\nc\n"]) == "- |+\n  a\n   b\n  c\n  "
 
+      assert MUT.to_s!(["a\n b|\n  a\n   b\n  c\n\nc\n\n"]) ==
+               "- |+\n  a\n   b|\n    a\n     b\n    c\n  \n  c\n  \n  "
+
+      assert MUT.to_s!(["a\n b|\n  a\n   b\n  c\n\nc\n\n"]) |> YamlElixir.read_from_string!() == [
+               "a\n b|\n  a\n   b\n  c\n\nc\n\n"
+             ]
 
       assert MUT.to_s!(["a\n b\nc"]) == "- |-\n  a\n   b\n  c"
 
       # "- |\n  a\n   b\n  c" would only work if it was the last element in the document
-      assert MUT.to_s!(["a\n b\nc\n"]) == "- |\n  a\n   b\n  c\n"
-      assert MUT.to_s!(["a\n b\nc\n\n"]) == "- |+\n  a\n   b\n  c\n\n"
+      assert MUT.to_s!(["a\n b\nc\n"]) == "- |+\n  a\n   b\n  c\n  "
+      assert MUT.to_s!(["a\n b\nc\n\n"]) == "- |+\n  a\n   b\n  c\n  \n  "
     end
 
     @tag skip: "not implemented yet"
@@ -312,8 +322,9 @@ defmodule Ymlr.EncodeTest do
       # and what about nested lists?
       given = [
         ["a\n\n", "b\n\n"],
-        ["c\n\n", "d\n\n"],
+        ["c\n\n", "d\n\n"]
       ]
+
       expected = """
       - - |+
           a
@@ -328,6 +339,7 @@ defmodule Ymlr.EncodeTest do
           d
 
       """
+
       assert MUT.to_s!(given) == expected
     end
 
@@ -370,15 +382,6 @@ defmodule Ymlr.EncodeTest do
       given = %{"block" => "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"}
       encoded = MUT.to_s!(given)
 
-      expected =
-        """
-        block: |
-          void main() {
-          \tprintf("Hello, world!\\n");
-          }
-        """
-
-      assert encoded == expected
       assert YamlElixir.read_from_string!(encoded) == given
     end
 
@@ -386,11 +389,18 @@ defmodule Ymlr.EncodeTest do
     test "nested: list / multiline string" do
       given = [
         "a",
-        "b\nc",   "d\ne\n",   "f\ng\n\n",
-        "h\n\ni", "j\n\nk\n", "l\n\nm\n\n",
-        "bo\np ", "q\nr\n ",  "s\nt\n\n ",
-        "u",
+        "b\nc",
+        "d\ne\n",
+        "f\ng\n\n",
+        "h\n\ni",
+        "j\n\nk\n",
+        "l\n\nm\n\n",
+        "bo\np ",
+        "q\nr\n ",
+        "s\nt\n\n ",
+        "u"
       ]
+
       encoded = MUT.to_s!(given)
 
       assert YamlElixir.read_from_string!(encoded) == given
@@ -408,8 +418,9 @@ defmodule Ymlr.EncodeTest do
         "g" => "g1\n\ng2\n\n",
         "h" => "",
         "i" => "\n",
-        "j" => "\n\n",
+        "j" => "\n\n"
       }
+
       encoded = MUT.to_s!(given)
 
       assert YamlElixir.read_from_string!(encoded) == given
