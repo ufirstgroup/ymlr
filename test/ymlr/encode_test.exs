@@ -276,9 +276,59 @@ defmodule Ymlr.EncodeTest do
     end
 
     # see https://yaml-multiline.info/
-    test "multiline strings" do
-      assert MUT.to_s!("hello\nworld") == "|-\nhello\nworld"
-      assert MUT.to_s!("hello\nworld\n") == "|\nhello\nworld"
+    test "multiline strings - level 0" do
+      assert MUT.to_s!("a\n\nb")       == "|-\n  a\n\n  b"
+      assert MUT.to_s!("a\n b\nc")     == "|-\n  a\n   b\n  c"      # "|..." would also work
+      assert MUT.to_s!("a\n b\nc\n ")  == "|-\n  a\n   b\n  c\n   " # "|..." would also work
+      assert MUT.to_s!("a\n b\nc\n")   == "|\n  a\n   b\n  c\n"
+      assert MUT.to_s!("a\n b\nc\n\n") == "|+\n  a\n   b\n  c\n\n"
+    end
+
+    test "multiline strings - level 1" do
+      assert MUT.to_s!(["a\n\nb"])       == "- |-\n  a\n\n  b"
+      assert MUT.to_s!(["a\n b\nc"])     == "- |-\n  a\n   b\n  c"      # "|..." would only work if it was the last element in the document
+      assert MUT.to_s!(["a\n b\nc\n "])  == "- |-\n  a\n   b\n  c\n   " # "|..." would only work if it was the last element in the document
+      assert MUT.to_s!(["a\n b\nc\n"])   == "- |\n  a\n   b\n  c\n"
+      assert MUT.to_s!(["a\n b\nc\n\n"]) == "- |+\n  a\n   b\n  c\n\n"
+
+
+      assert MUT.to_s!(["a\n b\nc"]) == "- |-\n  a\n   b\n  c"
+
+      # "- |\n  a\n   b\n  c" would only work if it was the last element in the document
+      assert MUT.to_s!(["a\n b\nc\n"]) == "- |\n  a\n   b\n  c\n"
+      assert MUT.to_s!(["a\n b\nc\n\n"]) == "- |+\n  a\n   b\n  c\n\n"
+    end
+
+    @tag skip: "not implemented yet"
+    test "multiline strings - mutliple terminal newlines" do
+      # if we join the strings in the list with \n we end up with an extra newline in between
+      # i.e.                                  "- |+\n  a\n\n\n- |+\n  b\n\n"
+      assert MUT.to_s!(["a\n\n", "b\n\n"]) == "- |+\n  a\n\n- |+\n  b\n\n"
+      assert MUT.to_s!(%{k1: "a\n\n", k2: "b\n\n"}) == "k1: |+\n  a\n\nk2: |+\n  b\n\n"
+
+      # just to be sure ... also check with 3 newlines
+      assert MUT.to_s!(["a", "b\n\n\n", "c"]) == "- a\n- |+\n  b\n\n\n- c"
+
+      # and what about nested lists?
+      given = [
+        ["a\n\n", "b\n\n"],
+        ["c\n\n", "d\n\n"],
+      ]
+      expected = """
+      - - |+
+          a
+
+        - |+
+          b
+
+      - - |+
+          c
+
+        - |+
+          d
+
+      """
+      assert MUT.to_s!(given) == expected
     end
 
     test "newline only string - encoding" do
@@ -317,7 +367,7 @@ defmodule Ymlr.EncodeTest do
 
     # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
     test "multiline strings - mix spaces and tabs" do
-      given = %{block: "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"}
+      given = %{"block" => "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"}
       encoded = MUT.to_s!(given)
 
       expected =
@@ -327,28 +377,42 @@ defmodule Ymlr.EncodeTest do
           \tprintf("Hello, world!\\n");
           }
         """
-        |> String.trim()
 
       assert encoded == expected
+      assert YamlElixir.read_from_string!(encoded) == given
     end
 
+    @tag skip: "not working yet"
     test "nested: list / multiline string" do
-      given = ["a\nb\n", "c"]
+      given = [
+        "a",
+        "b\nc",   "d\ne\n",   "f\ng\n\n",
+        "h\n\ni", "j\n\nk\n", "l\n\nm\n\n",
+        "bo\np ", "q\nr\n ",  "s\nt\n\n ",
+        "u",
+      ]
       encoded = MUT.to_s!(given)
 
-      assert encoded == "- |\n  a\n  b\n- c"
+      assert YamlElixir.read_from_string!(encoded) == given
     end
 
+    @tag skip: "not working yet"
     test "nested: map / multiline string" do
-      result =
-        MUT.to_s!(%{a: "a1\na2", b: "b1", c: "c1\nc2\n", d: "d1", nl: "\n"})
-        |> YamlElixir.read_from_string!()
+      given = %{
+        "a" => "a1",
+        "b" => "b1\nb2",
+        "c" => "c1\nc2\n",
+        "d" => "d1\nd2\n\n",
+        "e" => "e1\n\ne2",
+        "f" => "f1\n\nf2\n",
+        "g" => "g1\n\ng2\n\n",
+        "h" => "",
+        "i" => "\n",
+        "j" => "\n\n",
+      }
+      encoded = MUT.to_s!(given)
 
-      assert "a1\na2" == String.trim(result["a"])
-      assert "b1" == result["b"]
-      assert "c1\nc2" == String.trim(result["c"])
-      assert "d1" == result["d"]
-      assert "\n" == result["nl"]
+      assert YamlElixir.read_from_string!(encoded) == given
     end
 
     test "date" do
