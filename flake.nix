@@ -12,9 +12,9 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        elixir = pkgs.elixir;
+        # elixir = pkgs.elixir;
         # elixir = pkgs.beam.packages.elixir;
-        # elixir = pkgs.beam.packages.erlangR23.elixir_1_12;
+        elixir = pkgs.beam.packages.erlangR26.elixir_1_15;
 
       in {
         devShell = pkgs.mkShell {
