@@ -280,6 +280,40 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!("hello\nworld\n") == "|\nhello\nworld"
     end
 
+    test "newline only string - encoding" do
+      given = "\n"
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+      assert encoded == ~S("\n")
+    end
+
+    test "newline only string - in list" do
+      given = ["\n"]
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+      assert encoded == ~S(- "\n")
+
+      given = [1, "\n"]
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+
+      given = ["\n", 2]
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+
+      given = [1, "\n", 3]
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+      assert encoded == ~s(- 1\n- "\\n"\n- 3)
+    end
+
+    test "newline only string - in map" do
+      given = %{"a" => "\n"}
+      encoded = MUT.to_s!(given)
+      assert given == YamlElixir.read_from_string!(encoded)
+      assert encoded == ~S(a: "\n")
+    end
+
     # see https://yaml.org/spec/1.2.2/#example-tabs-and-spaces
     test "multiline strings - mix spaces and tabs" do
       given = %{"block" => "void main() {\n\tprintf(\"Hello, world!\\n\");\n}\n"}
@@ -305,7 +339,7 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "nested: map / multiline string" do
-      given = %{"a" => "a1\na2", "b" => "b1", "c" => "c1\nc2\n", "d" => "d1"}
+      given = %{"a" => "a1\na2", "b" => "b1", "c" => "c1\nc2\n", "d" => "d1", "nl" => "\n"}
       encoded = MUT.to_s!(given)
 
       assert YamlElixir.read_from_string!(encoded) == given
