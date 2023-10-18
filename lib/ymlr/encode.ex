@@ -107,6 +107,8 @@ defmodule Ymlr.Encode do
   end
 
   @spec list(data :: list(), indent_level :: integer, opts :: Encoder.opts()) :: iodata()
+  def list([], _, _), do: "[]"
+
   def list(data, indent_level, opts) do
     indentation = indent(indent_level)
 
@@ -202,7 +204,7 @@ defmodule Ymlr.Encode do
     indentation = indent(level)
 
     block =
-      data |> String.trim_trailing("\n") |> String.replace("\n", IO.iodata_to_binary(indentation))
+      data |> String.replace("\n", IO.iodata_to_binary(indentation))
 
     [block_chomping_indicator(data) | [indentation | block]]
   end
