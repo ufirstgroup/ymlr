@@ -90,7 +90,8 @@ defmodule Ymlr.EncodeTest do
     test "quoted strings - escape seq forces double quotes (tab char)" do
       assert_encode("a\tb", ~s("a\tb"))
       assert_encode("!a\tb", ~s("!a\tb"))
-      assert_encode(~S(@a\nb), ~s('@a\\nb'))
+      # Not for explicit backslash:
+      assert_encode(~S(!a\tb), ~S('!a\tb'))
     end
 
     test "quoted strings - listy and mappy things" do
@@ -112,7 +113,7 @@ defmodule Ymlr.EncodeTest do
 
     test "bitstrings" do
       assert_raise Protocol.UndefinedError, ~r/cannot encode a bitstring to YAML/, fn ->
-        assert MUT.to_s!(<<3::4>>)
+        MUT.to_s!(<<3::4>>)
       end
     end
 
@@ -150,8 +151,10 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "hex and oversize float" do
-      assert MUT.to_s!("7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718") ==
-               "7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718"
+      assert_encode(
+        "7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718",
+        "7e0981ff4c0daa3a47db5542ad5c167176145ef65f597a7f94ba2f5b41d35718"
+      )
 
       assert_encode("1.7976931348623157e+309", "1.7976931348623157e+309")
     end
@@ -191,7 +194,7 @@ defmodule Ymlr.EncodeTest do
 
     test "invalid map key" do
       assert_raise ArgumentError, fn ->
-        assert MUT.to_s!(%{%{a: 1} => 2})
+        MUT.to_s!(%{%{a: 1} => 2})
       end
     end
 
@@ -214,8 +217,8 @@ defmodule Ymlr.EncodeTest do
       assert "bar: 2" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
 
       result =
-        assert MUT.to_s!(%TestStructDerivedExceptDefaults{foo: 1, bar: 1, baz: :error})
-               |> YamlElixir.read_from_string!()
+        MUT.to_s!(%TestStructDerivedExceptDefaults{foo: 1, bar: 1, baz: :error})
+        |> YamlElixir.read_from_string!()
 
       assert 1 == result["foo"]
       assert "error" == result["baz"]
@@ -280,8 +283,8 @@ defmodule Ymlr.EncodeTest do
 
     test "nested: map / map" do
       result =
-        assert MUT.to_s!(%{a: %{b: 1, c: %{d: 2}}, e: %{f: 3, g: 4}})
-               |> YamlElixir.read_from_string!()
+        MUT.to_s!(%{a: %{b: 1, c: %{d: 2}}, e: %{f: 3, g: 4}})
+        |> YamlElixir.read_from_string!()
 
       assert 2 == result["a"]["c"]["d"]
       assert 1 == result["a"]["b"]
@@ -342,7 +345,6 @@ defmodule Ymlr.EncodeTest do
           }
         """
 
-      # not working yet => TODO better handling of terminal newlines
       assert YamlElixir.read_from_string!(encoded) == given
       # assert encoded == expected
       assert encoded == expected <> "  "
