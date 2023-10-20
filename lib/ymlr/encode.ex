@@ -38,25 +38,24 @@ defmodule Ymlr.Encode do
     ":"
   ]
 
-  @doc """
+  @doc ~S"""
   Encodes the given data as YAML string. Raises if it cannot be encoded.
 
   ## Examples
 
       iex> Ymlr.Encode.to_s!(%{})
-      "{}"
+      "{}\n"
 
       iex> Ymlr.Encode.to_s!(%{a: 1, b: 2})
-      "a: 1\\nb: 2"
+      "a: 1\nb: 2\n"
 
       iex> Ymlr.Encode.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
-      "a: a\\nb: b\\nc: 'true'\\nd: '100'"
+      "a: a\nb: b\nc: 'true'\nd: '100'\n"
   """
   @spec to_s!(data :: term(), opts :: Encoder.opts()) :: binary()
   def to_s!(data, opts \\ []) do
-    data
-    |> Ymlr.Encoder.encode(0, opts)
-    |> IO.iodata_to_binary()
+    encoded = Ymlr.Encoder.encode(data, 0, opts)
+    IO.iodata_to_binary([encoded, "\n"])
   end
 
   @doc ~S"""
@@ -65,7 +64,7 @@ defmodule Ymlr.Encode do
   ## Examples
 
       iex> Ymlr.Encode.to_s(%{a: 1, b: 2})
-      {:ok, "a: 1\nb: 2"}
+      {:ok, "a: 1\nb: 2\n"}
   """
   @spec to_s(data :: term(), opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
   def to_s(data, opts \\ []) do
@@ -201,16 +200,25 @@ defmodule Ymlr.Encode do
   defp multiline(data, nil), do: inspect(data)
   # see https://yaml-multiline.info/
   defp multiline(data, level) do
-    indentation = indent(level)
+    indentation = indent(if level == 0, do: 1, else: level)
 
     block =
-      data |> String.replace("\n", IO.iodata_to_binary(indentation))
+      data
+      |> String.replace_suffix("\n", "")
+      |> String.split("\n")
+      |> Enum.map(fn
+        "" ->
+          "\n"
 
-    [block_chomping_indicator(data) | [indentation | block]]
+        line ->
+          [indentation, line]
+      end)
+
+    [block_chomping_indicator(data) | [block]]
   end
 
   defp block_chomping_indicator(data) do
-    if String.ends_with?(data, "\n"), do: "|", else: "|-"
+    if String.ends_with?(data, "\n"), do: "|+", else: "|-"
   end
 
   defp indent(level) do
