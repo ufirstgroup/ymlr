@@ -296,12 +296,10 @@ defmodule Ymlr.EncodeTest do
 
     @tag :wip
     test "multiline strings - with multiple consecutive newlines" do
-      # to be discussed (same as above: indentation)
       assert_identity_and_output("a\n\nb", "|-\n  a\n\n  b")
     end
 
     test "multiline strings - with multiple terminal newlines" do
-      # to be discussed (same as above: indentation)
       assert_identity_and_output("a\n\n", "|+\n  a\n")
       assert_identity_and_output("a\n b\nc\n\n", "|+\n  a\n   b\n  c\n")
       # just to be sure ... also check with 3 newlines
@@ -316,7 +314,6 @@ defmodule Ymlr.EncodeTest do
 
     test "multiline strings - indented - with multiple consecutive newlines" do
       assert_identity_and_output(["a\n\nb"], "- |-\n  a\n\n  b")
-      # also possible:          "- |-\n  a\n  \n  b"
     end
 
     test "multiline strings - indented - with multiple trailing newlines" do
@@ -325,8 +322,6 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "multiline strings - nested - inside vs last" do
-      # if we join the strings in the list with \n we end up with an extra newline in between
-      # i.e.                            "- |+\n  a\n\n\n- |+\n  b\n\n"
       assert_identity_and_output(["a\n\n", "b\n\n"], "- |+\n  a\n\n- |+\n  b\n")
 
       # same with maps
@@ -341,8 +336,6 @@ defmodule Ymlr.EncodeTest do
       # just to be sure ... also check with 3 newlines
       assert_identity_and_output(["a\n\n\n"], "- |+\n  a\n\n")
       assert_identity_and_output(["a\n\n\n", "b"], "- |+\n  a\n\n\n- b")
-
-      # and what about nested lists? => see test "nested: list / list / multiline string"
     end
 
     test "newline only string - encoding" do
