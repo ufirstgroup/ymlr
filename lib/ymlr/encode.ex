@@ -44,18 +44,19 @@ defmodule Ymlr.Encode do
   ## Examples
 
       iex> Ymlr.Encode.to_s!(%{})
-      "{}\n"
+      "{}"
 
       iex> Ymlr.Encode.to_s!(%{a: 1, b: 2})
-      "a: 1\nb: 2\n"
+      "a: 1\nb: 2"
 
       iex> Ymlr.Encode.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
-      "a: a\nb: b\nc: 'true'\nd: '100'\n"
+      "a: a\nb: b\nc: 'true'\nd: '100'"
   """
   @spec to_s!(data :: term(), opts :: Encoder.opts()) :: binary()
   def to_s!(data, opts \\ []) do
-    encoded = Ymlr.Encoder.encode(data, 0, opts)
-    IO.iodata_to_binary([encoded, "\n"])
+    data
+    |> Ymlr.Encoder.encode(0, opts)
+    |> IO.iodata_to_binary()
   end
 
   @doc ~S"""
@@ -64,7 +65,7 @@ defmodule Ymlr.Encode do
   ## Examples
 
       iex> Ymlr.Encode.to_s(%{a: 1, b: 2})
-      {:ok, "a: 1\nb: 2\n"}
+      {:ok, "a: 1\nb: 2"}
   """
   @spec to_s(data :: term(), opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
   def to_s(data, opts \\ []) do

@@ -207,8 +207,8 @@ defmodule Ymlr.EncodeTest do
       result = MUT.to_s!(%TestStructDerivedAll{foo: 1, bar: 2}) |> YamlElixir.read_from_string!()
       assert 1 == result["foo"]
       assert 2 == result["bar"]
-      assert "foo: 1\n" == MUT.to_s!(%TestStructDerivedOnlyFoo{foo: 1, bar: 2})
-      assert "bar: 2\n" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
+      assert "foo: 1" == MUT.to_s!(%TestStructDerivedOnlyFoo{foo: 1, bar: 2})
+      assert "bar: 2" == MUT.to_s!(%TestStructDerivedExceptFoo{foo: 1, bar: 2})
 
       result =
         MUT.to_s!(%TestStructDerivedExceptDefaults{foo: 1, bar: 1, baz: :error})
@@ -224,11 +224,11 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "tuples" do
-      assert {:ok, "- a\n- b\n"} = MUT.to_s({"a", "b"})
+      assert {:ok, "- a\n- b"} = MUT.to_s({"a", "b"})
     end
 
     test "tuples (nested) - not supported" do
-      assert {:ok, "- - a\n  - b\n"} = MUT.to_s([{"a", "b"}])
+      assert {:ok, "- - a\n  - b"} = MUT.to_s([{"a", "b"}])
     end
 
     test "nested: list / list" do
@@ -236,8 +236,8 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "nested: list / map" do
-      assert_identity_and_output([%{a: 1}, %{b: 2}], "- :a: 1\n- :b: 2\n", atoms: true)
-      assert_identity_and_output([%{a: 1, b: 2}], "- :a: 1\n  :b: 2\n", atoms: true)
+      assert_identity_and_output([%{a: 1}, %{b: 2}], "- :a: 1\n- :b: 2", atoms: true)
+      assert_identity_and_output([%{a: 1, b: 2}], "- :a: 1\n  :b: 2", atoms: true)
     end
 
     test "nested: map / list" do
@@ -289,21 +289,9 @@ defmodule Ymlr.EncodeTest do
     # see https://yaml-multiline.info/
 
     test "multiline strings - base cases" do
-      # to be discussed:
-      # YamlElixir is ok with "|-\na\n b\nc" i.e. treats it the same as "|-\n a\n  b\n c" or "|-\n  a\n   b\n  c"
-      # but https://yaml-online-parser.appspot.com/ is not
       assert_identity_and_output("a\n b\nc", "|-\n  a\n   b\n  c")
-      # also possible:           "|\n  a\n   b\n  c"
-      # also possible:          "|+\n  a\n   b\n  c"
-
-      # to be discussed: should we try to use (single or double) quotes in this case?
-      # (support editor with trim trailing whitespaces)
       assert_identity_and_output("a\n b\nc\n ", "|-\n  a\n   b\n  c\n   ")
-      # also possible:              "|\n  a\n   b\n  c\n   "
-      # also possible:             "|+\n  a\n   b\n  c\n   "
-
-      assert_identity_and_output("a\n b\nc\n", "|+\n  a\n   b\n  c\n")
-      # also possible:           "|+\n  a\n   b\n  c\n"
+      assert_identity_and_output("a\n b\nc\n", "|+\n  a\n   b\n  c")
     end
 
     @tag :wip
@@ -314,10 +302,10 @@ defmodule Ymlr.EncodeTest do
 
     test "multiline strings - with multiple terminal newlines" do
       # to be discussed (same as above: indentation)
-      assert_identity_and_output("a\n\n", "|+\n  a\n\n")
-      assert_identity_and_output("a\n b\nc\n\n", "|+\n  a\n   b\n  c\n\n")
+      assert_identity_and_output("a\n\n", "|+\n  a\n")
+      assert_identity_and_output("a\n b\nc\n\n", "|+\n  a\n   b\n  c\n")
       # just to be sure ... also check with 3 newlines
-      assert_identity_and_output("a\n\n\n", "|+\n  a\n\n\n")
+      assert_identity_and_output("a\n\n\n", "|+\n  a\n\n")
     end
 
     test "multiline strings - indented - base cases" do
@@ -327,31 +315,31 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "multiline strings - indented - with multiple consecutive newlines" do
-      assert_identity_and_output(["a\n\nb"], "- |-\n  a\n\n  b\n")
+      assert_identity_and_output(["a\n\nb"], "- |-\n  a\n\n  b")
       # also possible:          "- |-\n  a\n  \n  b"
     end
 
     test "multiline strings - indented - with multiple trailing newlines" do
-      assert_identity_and_output(["a\n\n"], "- |+\n  a\n\n")
-      assert_identity_and_output(["a\n b\nc\n\n"], "- |+\n  a\n   b\n  c\n\n")
+      assert_identity_and_output(["a\n\n"], "- |+\n  a\n")
+      assert_identity_and_output(["a\n b\nc\n\n"], "- |+\n  a\n   b\n  c\n")
     end
 
     test "multiline strings - nested - inside vs last" do
       # if we join the strings in the list with \n we end up with an extra newline in between
       # i.e.                            "- |+\n  a\n\n\n- |+\n  b\n\n"
-      assert_identity_and_output(["a\n\n", "b\n\n"], "- |+\n  a\n\n- |+\n  b\n\n")
+      assert_identity_and_output(["a\n\n", "b\n\n"], "- |+\n  a\n\n- |+\n  b\n")
 
       # same with maps
-      assert_identity_and_output(%{k1: "a\n\n", k2: "b\n\n"}, ":k1: |+\n  a\n\n:k2: |+\n  b\n\n",
+      assert_identity_and_output(%{k1: "a\n\n", k2: "b\n\n"}, ":k1: |+\n  a\n\n:k2: |+\n  b\n",
         atoms: true
       )
 
-      assert_identity_and_output(%{k1: "a\n\n", k2: "b\n\n"}, ":k1: |+\n  a\n\n:k2: |+\n  b\n\n",
+      assert_identity_and_output(%{k1: "a\n\n", k2: "b\n\n"}, ":k1: |+\n  a\n\n:k2: |+\n  b\n",
         atoms: true
       )
 
       # just to be sure ... also check with 3 newlines
-      assert_identity_and_output(["a\n\n\n"], "- |+\n  a\n\n\n")
+      assert_identity_and_output(["a\n\n\n"], "- |+\n  a\n\n")
       assert_identity_and_output(["a\n\n\n", "b"], "- |+\n  a\n\n\n- b")
 
       # and what about nested lists? => see test "nested: list / list / multiline string"
@@ -381,7 +369,7 @@ defmodule Ymlr.EncodeTest do
         block: |+
           void main() {
           \tprintf("Hello, world!\\n");
-          }
+          }\
         """
 
       assert_identity_and_output(given, expected)
@@ -422,7 +410,6 @@ defmodule Ymlr.EncodeTest do
 
           - |+
             d
-
         """
 
       assert_identity_and_output(given, expected)
@@ -438,7 +425,7 @@ defmodule Ymlr.EncodeTest do
         "g" => "g1\n\ng2\n\n",
         "h" => "",
         "i" => "\n",
-        "j" => "\n\n"
+        "j" => "\n"
       })
     end
 

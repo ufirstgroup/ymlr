@@ -41,7 +41,7 @@ defmodule Ymlr do
 
   def document!({lines, data}, opts) when is_list(lines) do
     comments = Enum.map_join(lines, "", &"# #{&1}\n")
-    "---\n" <> comments <> Encode.to_s!(data, opts)
+    "---\n" <> comments <> Encode.to_s!(data, opts) <> "\n"
   end
 
   def document!({comment, data}, opts), do: document!({[comment], data}, opts)
