@@ -43,7 +43,8 @@ defmodule Ymlr.MixProject do
       "coveralls.travis": :test,
       "coveralls.github": :test,
       "coveralls.xml": :test,
-      "coveralls.json": :test
+      "coveralls.json": :test,
+      "test.watch": :test
     ]
   end
 
@@ -54,7 +55,7 @@ defmodule Ymlr.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.18", only: [:test]},
       {:ex_doc, "~> 0.30", only: :dev},
-      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
+      {:mix_test_watch, "~> 1.0", only: :test, runtime: false},
       {:yaml_elixir, "~> 2.4", only: [:test]}
     ]
   end
