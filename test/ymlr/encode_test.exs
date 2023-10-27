@@ -291,7 +291,7 @@ defmodule Ymlr.EncodeTest do
     test "multiline strings - base cases" do
       assert_identity_and_output("a\n b\nc", "|-\n  a\n   b\n  c")
       assert_identity_and_output("a\n b\nc\n ", "|-\n  a\n   b\n  c\n   ")
-      assert_identity_and_output("a\n b\nc\n", "|+\n  a\n   b\n  c")
+      assert_identity_and_output("a\n b\nc\n", "|\n  a\n   b\n  c")
     end
 
     @tag :wip
@@ -309,7 +309,7 @@ defmodule Ymlr.EncodeTest do
     test "multiline strings - indented - base cases" do
       assert_identity_and_output(["a\n b\nc"], "- |-\n  a\n   b\n  c")
       assert_identity_and_output(["a\n b\nc\n "], "- |-\n  a\n   b\n  c\n   ")
-      assert_identity_and_output(["a\n b\nc\n"], "- |+\n  a\n   b\n  c")
+      assert_identity_and_output(["a\n b\nc\n"], "- |\n  a\n   b\n  c")
     end
 
     test "multiline strings - indented - with multiple consecutive newlines" do
@@ -359,7 +359,7 @@ defmodule Ymlr.EncodeTest do
 
       expected =
         """
-        block: |+
+        block: |
           void main() {
           \tprintf("Hello, world!\\n");
           }\
@@ -369,7 +369,7 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "nested: list / multiline string" do
-      assert_identity_and_output(["a\nb\n", "c"], "- |+\n  a\n  b\n- c")
+      assert_identity_and_output(["a\nb\n", "c"], "- |\n  a\n  b\n- c")
 
       assert_identity([
         "a",

@@ -201,6 +201,8 @@ defmodule Ymlr.Encode do
   defp multiline(data, nil), do: inspect(data)
   # see https://yaml-multiline.info/
   defp multiline(data, level) do
+    # This is pure aesthetics: If we are on level 0 (no indentation), we add one
+    # level of indentation to make it look a bit nicer.
     indentation = indent(if level == 0, do: 1, else: level)
 
     block =
@@ -219,7 +221,11 @@ defmodule Ymlr.Encode do
   end
 
   defp block_chomping_indicator(data) do
-    if String.ends_with?(data, "\n"), do: "|+", else: "|-"
+    cond do
+      String.ends_with?(data, "\n\n") -> "|+"
+      String.ends_with?(data, "\n") -> "|"
+      :otherwise -> "|-"
+    end
   end
 
   defp indent(level) do
