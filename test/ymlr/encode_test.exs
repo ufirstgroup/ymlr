@@ -165,20 +165,15 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "maps" do
-      assert_identity_and_output(%{a: 1}, ":a: 1", atoms: true)
-      assert_identity_and_output(%{a: 1, b: 2}, ":a: 1\n:b: 2", atoms: true)
       assert_identity_and_output(%{"a" => 1, "b" => 2}, "a: 1\nb: 2")
       assert_identity_and_output(%{"a b" => 1, "c d" => 2}, "a b: 1\nc d: 2")
       assert_identity_and_output(%{1 => 1, 2 => 2}, "1: 1\n2: 2")
-      assert_identity_and_output(%{a: nil}, ":a:", atoms: true)
+      assert_identity_and_output(%{"a" => nil}, "a:")
     end
 
     test "maps with atoms: true" do
       assert_identity_and_output(%{a: 1}, ":a: 1", atoms: true)
       assert_identity_and_output(%{a: 1, b: 2}, ":a: 1\n:b: 2", atoms: true)
-      assert_identity_and_output(%{"a" => 1, "b" => 2}, "a: 1\nb: 2")
-      assert_identity_and_output(%{"a b" => 1, "c d" => 2}, "a b: 1\nc d: 2")
-      assert_identity_and_output(%{1 => 1, 2 => 2}, "1: 1\n2: 2")
       assert_identity_and_output(%{a: nil}, ":a:", atoms: true)
     end
 
@@ -186,17 +181,21 @@ defmodule Ymlr.EncodeTest do
       assert MUT.to_s!(Map.new(1..33, &{&1, &1}), sort_maps: true) |> String.starts_with?("1: 1")
     end
 
-    test "invalid map key" do
+    test "invalid map key (map as map key)" do
       assert_raise ArgumentError, fn ->
-        MUT.to_s!(%{%{a: 1} => 2}, atoms: true)
+        MUT.to_s!(%{%{a: 1} => 2})
       end
     end
 
     test "maps - string values" do
-      assert_identity_and_output(%{a: "a"}, ":a: a", atoms: true)
-      assert_output(%{a: :b}, ":a: b", atoms: true)
-      assert_identity_and_output(%{a: "true"}, ":a: 'true'", atoms: true)
-      assert_identity_and_output(%{a: "1"}, ":a: '1'", atoms: true)
+      assert_identity_and_output(%{"a" => "a"}, "a: a")
+      assert_identity_and_output(%{"a" => "true"}, "a: 'true'")
+      assert_identity_and_output(%{"a" => "1"}, "a: '1'")
+    end
+
+    test "maps - atom value (lossy, convert to string)" do
+      # cannot assert identity
+      assert_output(%{"a" => :b}, "a: b")
     end
 
     test "structs" do
@@ -236,43 +235,31 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "nested: list / map" do
-      assert_identity_and_output([%{a: 1}, %{b: 2}], "- :a: 1\n- :b: 2", atoms: true)
-      assert_identity_and_output([%{a: 1, b: 2}], "- :a: 1\n  :b: 2", atoms: true)
+      assert_identity_and_output([%{"a" => 1}, %{"b" => 2}], "- a: 1\n- b: 2")
+      assert_identity_and_output([%{"a" => 1, "b" => 2}], "- a: 1\n  b: 2")
     end
 
     test "nested: map / list" do
       expected =
         """
-        :a:
+        a:
           - 1
           - 2
-        :b:
+        b:
           - 3
           - 4
         """
         |> String.trim()
 
-      assert_identity_and_output(%{a: [1, 2], b: [3, 4]}, expected, atoms: true)
+      assert_identity_and_output(%{"a" => [1, 2], "b" => [3, 4]}, expected)
     end
 
     test "nested: map / empty list" do
-      expected =
-        """
-        :a: []
-        """
-        |> String.trim()
-
-      assert_identity_and_output(%{a: []}, expected, atoms: true)
+      assert_identity_and_output(%{"a" => []}, "a: []")
     end
 
     test "nested: map / empty map" do
-      expected =
-        """
-        :a: {}
-        """
-        |> String.trim()
-
-      assert_identity_and_output(%{a: %{}}, expected, atoms: true)
+      assert_identity_and_output(%{"a" => %{}}, "a: {}")
     end
 
     test "nested: map / map" do
@@ -324,12 +311,9 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output(["a\n\n", "b\n\n"], "- |+\n  a\n\n- |+\n  b\n")
 
       # same with maps
-      assert_identity_and_output(%{k1: "a\n\n", k2: "b\n\n"}, ":k1: |+\n  a\n\n:k2: |+\n  b\n",
-        atoms: true
-      )
-
-      assert_identity_and_output(%{k1: "a\n\n", k2: "b\n\n"}, ":k1: |+\n  a\n\n:k2: |+\n  b\n",
-        atoms: true
+      assert_identity_and_output(
+        %{"k1" => "a\n\n", "k2" => "b\n\n"},
+        "k1: |+\n  a\n\nk2: |+\n  b\n"
       )
 
       # just to be sure ... also check with 3 newlines
