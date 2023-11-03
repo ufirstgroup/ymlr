@@ -294,7 +294,6 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("a\n b\nc\n", "|\n  a\n   b\n  c")
     end
 
-    @tag :wip
     test "multiline strings - with multiple consecutive newlines" do
       assert_identity_and_output("a\n\nb", "|-\n  a\n\n  b")
     end
