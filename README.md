@@ -20,7 +20,7 @@ The package can be installed by adding `ymlr` to your list of dependencies in `m
 ```elixir
 def deps do
   [
-    {:ymlr, "~> 4.0"}
+    {:ymlr, "~> 5.0"}
   ]
 end
 ```
@@ -78,7 +78,6 @@ to parse it later using [`YamlElixir`'s `atoms`
 option](https://hexdocs.pm/yaml_elixir/readme.html#support-for-atoms), you can
 pass `atoms: true` as second argument to any of the `Ymlr` module's functions:
 
-
 ```elixir
 iex> Ymlr.document!(%{a: 1}, atoms: true)
 """
@@ -88,6 +87,7 @@ iex> Ymlr.document!(%{a: 1}, atoms: true)
 ```
 
 ### Encode maps with keys sorted
+
 Maps in elixir, implemented by erlang `:maps`, internally are `flatmap`s or `hashmap`s by size.
 Large maps will be encoded in strange order.
 

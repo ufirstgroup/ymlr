@@ -10,12 +10,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+<!--------------------- Don't add new entries after this line --------------------->
+
+## [5.0.0] - 2023-11-03
+
+Although this release contains only fixes but as the encoding changes, we
+consider it a breaking change. Hence the major bump.
+
 ### Fixed
 
 - handle "\n" strings - [#157](https://github.com/ufirstgroup/ymlr/issues/157),[#159](https://github.com/ufirstgroup/ymlr/pull/159)
 - handle empty list - [#163](https://github.com/ufirstgroup/ymlr/pull/163)
-
-<!--------------------- Don't add new entries after this line --------------------->
 
 ## [4.2.0] - 2023-08-18
 
