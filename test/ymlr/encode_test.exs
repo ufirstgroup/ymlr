@@ -175,6 +175,7 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output(%{a: 1}, ":a: 1", atoms: true)
       assert_identity_and_output(%{a: 1, b: 2}, ":a: 1\n:b: 2", atoms: true)
       assert_identity_and_output(%{a: nil}, ":a:", atoms: true)
+      assert_identity_and_output(%{"a" => 1}, "a: 1", atoms: true)
     end
 
     test "maps with sort_maps: true" do
