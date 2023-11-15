@@ -155,7 +155,6 @@ defmodule Ymlr.Encode do
       data == "True" -> ~S('True')
       data == "False" -> ~S('False')
       String.contains?(data, "\n") -> multiline(data, indent_level)
-      String.contains?(data, "\t") -> ~s("#{data}")
       String.at(data, 0) in @quote_when_first -> with_quotes(data)
       String.at(data, -1) in @quote_when_last -> with_quotes(data)
       String.starts_with?(data, "- ") -> with_quotes(data)
@@ -194,7 +193,9 @@ defmodule Ymlr.Encode do
   end
 
   defp escape(data) do
-    data |> String.replace("\\", "\\\\") |> String.replace(~s("), ~s(\\"))
+    data
+    |> String.replace("\\", "\\\\")
+    |> String.replace(~S("), ~S(\"))
   end
 
   # for example for map keys

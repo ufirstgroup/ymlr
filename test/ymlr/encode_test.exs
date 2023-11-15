@@ -15,8 +15,9 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("", "''")
     end
 
-    test "simple string" do
+    test "plain strings" do
       assert_identity_and_output("hello world", "hello world")
+      assert_identity_and_output("that's it", "that's it")
     end
 
     # see http://blogs.perl.org/users/tinita/2018/03/strings-in-yaml---to-quote-or-not-to-quote.html
@@ -79,8 +80,8 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "quoted strings - escape seq forces double quotes (tab char)" do
-      assert_identity_and_output("a\tb", ~s("a\tb"))
-      assert_identity_and_output("!a\tb", ~s("!a\tb"))
+      assert_identity_and_output("a\tb", ~s(a\tb))
+      assert_identity_and_output("!a\tb", ~s('!a\tb'))
       # Not for explicit backslash:
       assert_identity_and_output(~S(!a\tb), ~S('!a\tb'))
     end
@@ -89,7 +90,7 @@ defmodule Ymlr.EncodeTest do
       # ... (prefer single quotes)
       assert_identity_and_output("[]", ~S('[]'))
       assert_identity_and_output(~S(["hello"]), ~S('["hello"]'))
-      assert_identity_and_output(~S(["he|\o"]), ~S('["he|\o"]'))
+      assert_identity_and_output(~S(["he|\o"]), ~s('["he|\\o"]'))
       assert_identity_and_output("{}", ~S('{}'))
       assert_identity_and_output("[{}]", ~S('[{}]'))
       # ... (use double quotes if string contains single quotes)
@@ -111,25 +112,70 @@ defmodule Ymlr.EncodeTest do
       end
     end
 
-    @tag skip: "not sure about those => to be reviewed"
     # https://yaml.org/spec/1.2.2/#example-escaped-characters
     test "quoted strings - example-escaped-characters from 1.2.2 spec" do
-      assert_identity_and_output("Fun with \\", ~S("Fun with \\"))
-      assert_identity_and_output("\" \u0007 \b \u001b \f", ~S("\" \a \b \e \f"))
-      # assert_identity_and_output("\n \r \t \u000b \u0000", ~S("\n \r \t \v \0"))
-      # or we use | when string contains newlines => rewrite the example to:
-      assert_identity_and_output("\r \t \u000b \u0000", ~S("\r \t \v \0"))
-      assert_identity_and_output("\u0020 \u00a0 \u0085 \u2028 \u2029", ~S("\  \_ \N \L \P"))
+      assert_identity_and_output("Fun with \\", "Fun with \\")
     end
 
-    @tag skip: "not sure about those => review the spec"
     test "quoted strings - in map key (requires escape char)" do
-      assert_identity_and_output(%{"a\tb" => "value"}, ~s("a\tb": value))
-      assert_identity_and_output(%{"a\rb" => "value"}, ~s("a\rb": value))
+      assert_identity_and_output(%{"a\tb" => "value"}, ~s(a\tb: value))
+    end
+
+    @tag skip: "Identity test fails"
+    test "Special bytes" do
+      assert_identity_and_output(%{"a\rb" => "value"}, ~s(a\rb: value))
+      assert_identity_and_output("\n \r \t \u000b \u0000", "|-\n\n   \r \t \v \0")
+
+      assert_identity_and_output(
+        "\u0020 \u00a0 \u0085 \u2028 \u2029",
+        <<32, 32, 194, 160, 32, 194, 133, 32, 226, 128, 168, 32, 226, 128, 169>>
+      )
+    end
+
+    @tag skip: "YamlElixir throws a parsing Error"
+    test "Special bytes 2" do
+      assert_identity_and_output("\" \u0007 \b \u001b \f", "'\" \a \b \e \f'")
+      assert_identity_and_output("\r \t \u000b \u0000", "'\r \t \v \0'")
     end
 
     test "newline in map key" do
       assert_identity_and_output(%{"a\nb" => "value"}, ~S("a\nb": value))
+    end
+
+    test "backslash" do
+      # in plain string
+      assert assert_identity_and_output(~S(a\b), ~S(a\b))
+      # in single quote string
+      assert assert_identity_and_output(~S(!a\b), ~S('!a\b'))
+      # double quotes because of single quote
+      assert assert_identity_and_output(~s(!a'b\\c), ~S("!a'b\\c"))
+      # double quotes because of tab
+      assert assert_identity_and_output(~s(a\tb\\c), ~s(a\tb\\c))
+    end
+
+    test "backslash in map key" do
+      # in plain string
+      assert assert_identity_and_output(%{~S(a\b) => "value"}, ~S(a\b: value))
+      # in single quote string
+      assert assert_identity_and_output(%{~S(!a\b) => "value"}, ~S('!a\b': value))
+      # double quotes because of single quote
+      assert assert_identity_and_output(%{~s(a'b\\c) => "value"}, ~s(a'b\\c: value))
+      # double quotes because of tab
+      assert assert_identity_and_output(%{~s(a\tb\\c) => "value"}, ~s(a\tb\\c: value))
+    end
+
+    test "tab" do
+      # would be plain string without the tab
+      assert assert_identity_and_output("a\tb", ~s(a\tb))
+      # would be single quoted string without the tab
+      assert assert_identity_and_output("!a\tb", ~s('!a\tb'))
+    end
+
+    test "tab in map key" do
+      # would be plain string without the tab
+      assert assert_identity_and_output(%{"a\tb" => "value"}, ~s(a\tb: value))
+      # would be single quoted string without the tab
+      assert assert_identity_and_output(%{"!a\tb" => "value"}, ~s('!a\tb': value))
     end
 
     test "integers" do
@@ -404,6 +450,14 @@ defmodule Ymlr.EncodeTest do
         "i" => "\n",
         "j" => "\n"
       })
+    end
+
+    test "tab(s) and newline(s) in the same string" do
+      assert_identity_and_output("a\tb\nc", "|-\n  a\tb\n  c")
+      # with extra whitespaces around the newline
+      assert_identity_and_output("a\tb \n c", "|-\n  a\tb \n   c")
+      # with backslash
+      assert_identity_and_output(~s(a\tb\nc\\w), "|-\n  a\tb\n  c\\w")
     end
 
     test "date" do
