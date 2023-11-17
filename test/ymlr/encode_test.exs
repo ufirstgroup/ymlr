@@ -25,6 +25,7 @@ defmodule Ymlr.EncodeTest do
     test "quoted strings - avoid type confusion" do
       assert_identity_and_output("yes", ~S('yes'))
       assert_identity_and_output("no", ~S('no'))
+      assert_identity_and_output("~", "'~'")
       assert_identity_and_output("true", ~S('true'))
       assert_identity_and_output("false", ~S('false'))
       assert_identity_and_output("True", ~S('True'))
@@ -79,7 +80,7 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("some:entry:", ~S('some:entry:'))
     end
 
-    test "quoted strings - escape seq forces double quotes (tab char)" do
+    test "quoted strings - tab char with and without quotes" do
       assert_identity_and_output("a\tb", ~s(a\tb))
       assert_identity_and_output("!a\tb", ~s('!a\tb'))
       # Not for explicit backslash:
@@ -114,28 +115,28 @@ defmodule Ymlr.EncodeTest do
 
     # https://yaml.org/spec/1.2.2/#example-escaped-characters
     test "quoted strings - example-escaped-characters from 1.2.2 spec" do
-      assert_identity_and_output("Fun with \\", "Fun with \\")
+      assert_identity_and_output(~S(Fun with \\), ~S(Fun with \\))
+      assert_identity_and_output("\" \u0007 \b \u001b \f", ~S("\" \a \b \e \f"))
+      # Line breaks inside scalar content must be normalized by the YAML processor.
+      # Each such line break must be parsed into a single line feed character.
+      # The original line break format is a presentation detail and must not be
+      # used to convey content information.
+      # I.e. the following cannot be tested for identity as \r will be parsed as \n.
+      assert_output("\n\r \t \u000b \u0000", "|-\n\n  \r \t \v \0")
+      assert_identity_and_output("\r \t \u000b \u0000", ~s("\\r \t \\v \\0"))
+
+      assert_identity_and_output(
+        "\u0020 \u00a0 \u0085 \u2028 \u2029",
+        ~S("  \_ \N \L \P")
+      )
+
+      # Possible formats: \x13 \u0013 \U00000013. We use \x13
+      assert_identity_and_output("\u0013", "\"\\x13\"")
     end
 
     test "quoted strings - in map key (requires escape char)" do
       assert_identity_and_output(%{"a\tb" => "value"}, ~s(a\tb: value))
-    end
-
-    @tag skip: "Identity test fails"
-    test "Special bytes" do
-      assert_identity_and_output(%{"a\rb" => "value"}, ~s(a\rb: value))
-      assert_identity_and_output("\n \r \t \u000b \u0000", "|-\n\n   \r \t \v \0")
-
-      assert_identity_and_output(
-        "\u0020 \u00a0 \u0085 \u2028 \u2029",
-        <<32, 32, 194, 160, 32, 194, 133, 32, 226, 128, 168, 32, 226, 128, 169>>
-      )
-    end
-
-    @tag skip: "YamlElixir throws a parsing Error"
-    test "Special bytes 2" do
-      assert_identity_and_output("\" \u0007 \b \u001b \f", "'\" \a \b \e \f'")
-      assert_identity_and_output("\r \t \u000b \u0000", "'\r \t \v \0'")
+      assert_identity_and_output(%{"a\rb" => "value"}, ~s("a\\rb": value))
     end
 
     test "newline in map key" do
@@ -321,6 +322,11 @@ defmodule Ymlr.EncodeTest do
     end
 
     # see https://yaml-multiline.info/
+    @tag skip: "still buggy"
+    test "multiline strings - starting with spaces" do
+      assert_identity_and_output("\n   abc", "|-\n\n     abc")
+      assert_identity_and_output("   abc\nabc", "|-\n     abc\n  abc")
+    end
 
     test "multiline strings - base cases" do
       assert_identity_and_output("a\n b\nc", "|-\n  a\n   b\n  c")

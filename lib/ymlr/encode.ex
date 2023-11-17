@@ -38,6 +38,30 @@ defmodule Ymlr.Encode do
     ":"
   ]
 
+  @printable_chars List.flatten([
+                     # Tab (\t)
+                     0x09,
+                     # Line feed (LF \n)
+                     0x0A,
+                     # Carriage Return (CR \r)
+                     # 0x0D, theoretically printable, seems to require double quotes.
+                     # Next Line (NEL)
+                     0x85,
+                     # Printable ASCII
+                     Enum.to_list(0x20..0x7E),
+                     # Basic Multilingual Plane (BMP)
+                     Enum.to_list(0xA0..0xFF)
+                   ])
+
+  @non_printable_chars Enum.to_list(0x00..0xA0) -- @printable_chars
+  @quoted_when_special @non_printable_chars ++ ~c"\a\b\e\f\v\0\u00a0\u0085\u2028\u2029"
+  @quoted_when_special_strings Enum.map(@quoted_when_special, &<<&1::utf8>>)
+
+  # see https://yaml.org/spec/1.2.2/#57-escaped-characters
+  @escape_chars ~c"\a\b\e\f\r\v\0\u00a0\u0085\u2028\u2029\"\\"
+  @escape_char_mapping Enum.zip(@escape_chars, ~c"abefrv0_NLP\"\\")
+  @non_printable_special_chars @non_printable_chars -- @escape_chars
+
   @doc ~S"""
   Encodes the given data as YAML string. Raises if it cannot be encoded.
 
@@ -146,6 +170,7 @@ defmodule Ymlr.Encode do
   defp encode_binary(data, indent_level) do
     cond do
       data == "" -> ~S('')
+      data == "~" -> ~S('~')
       data == "\n" -> ~S("\n")
       data == "null" -> ~S('null')
       data == "yes" -> ~S('yes')
@@ -155,6 +180,7 @@ defmodule Ymlr.Encode do
       data == "True" -> ~S('True')
       data == "False" -> ~S('False')
       String.contains?(data, "\n") -> multiline(data, indent_level)
+      String.contains?(data, @quoted_when_special_strings) -> with_double_quotes(data)
       String.at(data, 0) in @quote_when_first -> with_quotes(data)
       String.at(data, -1) in @quote_when_last -> with_quotes(data)
       String.starts_with?(data, "- ") -> with_quotes(data)
@@ -186,17 +212,34 @@ defmodule Ymlr.Encode do
 
   defp with_quotes(data) do
     if String.contains?(data, "'") do
-      ~s("#{escape(data)}")
+      with_double_quotes(data)
     else
-      ~s('#{data}')
+      with_single_quotes(data)
     end
   end
 
-  defp escape(data) do
-    data
-    |> String.replace("\\", "\\\\")
-    |> String.replace(~S("), ~S(\"))
+  defp with_double_quotes(data) do
+    ~s("#{escape(data)}")
   end
+
+  defp with_single_quotes(data), do: ~s('#{data}')
+
+  defp escape(data) do
+    for <<char::utf8 <- data>> do
+      escape_char(char)
+    end
+  end
+
+  for {char, escaped} <- @escape_char_mapping do
+    defp escape_char(unquote(char)), do: <<?\\, unquote(escaped)>>
+  end
+
+  for uchar <- @non_printable_special_chars do
+    unicode_sequence = List.to_string(:io_lib.format("\\x~2.16.0B", [uchar]))
+    defp escape_char(unquote(uchar)), do: unquote(unicode_sequence)
+  end
+
+  defp escape_char(char), do: char
 
   # for example for map keys
   defp multiline(data, nil), do: inspect(data)
