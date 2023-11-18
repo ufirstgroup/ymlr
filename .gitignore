@@ -29,6 +29,7 @@ k8s-*.tar
 # Ignore dialyzer files
 /priv/plts/*.plt
 /priv/plts/*.plt.hash
+/benchmark/*.json
 
 # Idea files
 /.idea
