@@ -112,3 +112,18 @@ iex> 1..33 |> Map.new(&{&1, &1})|> Ymlr.document!(sort_maps: true) |> IO.puts
 ...
 
 ```
+
+## Benchmark
+
+This library does not claim to be particularly performant. We do have a script
+to benchmark encoding so we know if performance gets better or worse with
+changes.
+
+You can find the last Benchmark in [BENCHMARK.md](BENCHMARK.md)
+
+### Running the script
+
+```bash
+cd benachmar
+elixir run.exs
+```

@@ -20,7 +20,7 @@ defmodule Ymlr.MixProject do
       ],
       docs: [
         main: "readme",
-        extras: ["README.md", "usage.livemd", "CHANGELOG.md"],
+        extras: ["README.md", "usage.livemd", "CHANGELOG.md", "BENCHMARK.md"],
         source_ref: "v#{@version}",
         source_url: @source_url
       ],
