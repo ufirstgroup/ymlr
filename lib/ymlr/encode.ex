@@ -1,5 +1,67 @@
 defmodule Ymlr.Encode do
-  @moduledoc false
+  @moduledoc ~S"""
+
+  This module implements the logic of encoding scalars.
+
+  ## Strings and Characters
+
+  ### Printable Characters
+
+  The YAML spec defines a set of printable characters `c-printable` (see
+  https://yaml.org/spec/1.2.2/#character-set). All these characters can
+  theoretically be left alone when encoding a string.
+
+  ### Escape Characters
+
+  The YAML spec also defines a set of escape charactesr `c-ns-esc-char` (see
+  https://yaml.org/spec/1.2.2/#57-escaped-characters). Some of these chars are
+  also in the printable range `c-printable`. Being in `c-printable` means they
+  could be left alone. I.e. there would be no need to encode them as escape
+  chars. However, we think in certain cases, escape characters are more
+  reader friendly than the actual characters. An example is the "next line"
+  character (`U+0085` or `\N`). It is part of `c-printable`. However, on the
+  screen this character cannot be distinguished from a simple "line feed"
+  character (`U+000A` or `\n`). Therefore all characters in `c-ns-esc-char` with
+  the exception of `\n` and `\t` are always encoded using their escape character.
+
+  ### Other 8-bit Unicode Characters
+
+  Any 8-bit unicode character that neither a printable nor an escape character
+  has to be encoded using one of the three unicode escape characters \x, \u or
+  \U (i.e. \xXX, \u00XX or \U000000XX).
+
+  ### Double Quotes for Escape Characters
+
+  Printable Characters can be encoded unquoted, single-quoted or double-quoted.
+  Escape characters require double quotes.
+
+  ### Chars with Special Treatments
+
+  #### Chars `\n` and `\t`
+
+  These two characters are never converted to their escape characters.
+  One exception: If the given string is literally just a newline, we
+  encode it as "\n" (double quotes required for escape chars) rather than a
+  single newline.
+
+  #### Chars `"` and `\`
+
+  These two characters have escape characters (`\"` and `\\`) but they are also
+  part of the of the printable character range `c-printable` and they have a
+  well-defined presentation on the screen. Ocurrance of these characters don't
+  enforce double-quotes but if they occur within a string that for other reasons
+  requires double-quotes, they need to be escaped.
+
+  ### Implemented Decision Logic
+
+  First matching rule is applied:
+
+  1. Char is `\t` or `\n` => leave alone
+  1. Char is `"` or `\` => if within double quotes, escape. Otherwise leave alone.
+  1. Char has an escape character (i.e. is part of `c-ns-esc-char`) => force double quotes and encode as escape character
+  1. Char is a printable character => leave alone
+  1. Char is a non-printable character => force double quotes and encode as \xXX (only 8-bit supported for now)
+  """
 
   alias Ymlr.Encoder
 
@@ -38,6 +100,19 @@ defmodule Ymlr.Encode do
     ":"
   ]
 
+  # Escape chars that, if contained within, force the string to be double-quoted:
+  @escape_chars_forcing_double_quotes ~c"\a\b\e\f\r\v\0\u00a0\u0085\u2028\u2029"
+
+  # Chars that have to be escaped if within double quotes:
+  @escape_if_within_double_quotes @escape_chars_forcing_double_quotes ++ ~c"\"\\"
+
+  # mapping char => escape char.
+  @escape_if_within_double_quotes_mapping Enum.zip(
+                                            @escape_if_within_double_quotes,
+                                            ~c"abefrv0_NLP\"\\"
+                                          )
+
+  # Printable Characters (8-bit only for now):
   @printable_chars List.flatten([
                      # Tab (\t)
                      0x09,
@@ -53,14 +128,16 @@ defmodule Ymlr.Encode do
                      Enum.to_list(0xA0..0xFF)
                    ])
 
-  @non_printable_chars Enum.to_list(0x00..0xA0) -- @printable_chars
-  @quoted_when_special @non_printable_chars ++ ~c"\a\b\e\f\v\0\u00a0\u0085\u2028\u2029"
-  @quoted_when_special_strings Enum.map(@quoted_when_special, &<<&1::utf8>>)
+  # Non-Printable Characters (8-bit only for now) - all chars minus union of printable and escape chars:
+  @non_printable_chars Enum.to_list(0x00..0xFF) --
+                         (@printable_chars ++ @escape_if_within_double_quotes)
 
-  # see https://yaml.org/spec/1.2.2/#57-escaped-characters
-  @escape_chars ~c"\a\b\e\f\r\v\0\u00a0\u0085\u2028\u2029\"\\"
-  @escape_char_mapping Enum.zip(@escape_chars, ~c"abefrv0_NLP\"\\")
-  @non_printable_special_chars @non_printable_chars -- @escape_chars
+  # Chars that, if contained within, force the string to be double-quoted:
+  @chars_forcing_double_quotes_strings Enum.map(
+                                         @non_printable_chars ++
+                                           @escape_chars_forcing_double_quotes,
+                                         &<<&1::utf8>>
+                                       )
 
   @doc ~S"""
   Encodes the given data as YAML string. Raises if it cannot be encoded.
@@ -180,7 +257,7 @@ defmodule Ymlr.Encode do
       data == "True" -> ~S('True')
       data == "False" -> ~S('False')
       String.contains?(data, "\n") -> multiline(data, indent_level)
-      String.contains?(data, @quoted_when_special_strings) -> with_double_quotes(data)
+      String.contains?(data, @chars_forcing_double_quotes_strings) -> with_double_quotes(data)
       String.at(data, 0) in @quote_when_first -> with_quotes(data)
       String.at(data, -1) in @quote_when_last -> with_quotes(data)
       String.starts_with?(data, "- ") -> with_quotes(data)
@@ -230,11 +307,11 @@ defmodule Ymlr.Encode do
     end
   end
 
-  for {char, escaped} <- @escape_char_mapping do
+  for {char, escaped} <- @escape_if_within_double_quotes_mapping do
     defp escape_char(unquote(char)), do: <<?\\, unquote(escaped)>>
   end
 
-  for uchar <- @non_printable_special_chars do
+  for uchar <- @non_printable_chars do
     unicode_sequence = List.to_string(:io_lib.format("\\x~2.16.0B", [uchar]))
     defp escape_char(unquote(uchar)), do: unquote(unicode_sequence)
   end

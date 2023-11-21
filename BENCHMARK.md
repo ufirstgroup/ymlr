@@ -1,6 +1,6 @@
 Benchmark
 
-Benchmark run from 2023-11-20 14:52:22.679140Z UTC
+Benchmark run from 2023-11-21 21:51:23.068588Z UTC
 
 ## System
 
@@ -65,20 +65,20 @@ Run Time
 
   <tr>
     <td style="white-space: nowrap">Jason</td>
-    <td style="white-space: nowrap; text-align: right">279.16</td>
-    <td style="white-space: nowrap; text-align: right">3.58 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;13.81%</td>
-    <td style="white-space: nowrap; text-align: right">3.34 ms</td>
-    <td style="white-space: nowrap; text-align: right">4.81 ms</td>
+    <td style="white-space: nowrap; text-align: right">273.46</td>
+    <td style="white-space: nowrap; text-align: right">3.66 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;15.86%</td>
+    <td style="white-space: nowrap; text-align: right">3.37 ms</td>
+    <td style="white-space: nowrap; text-align: right">5.53 ms</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">Ymlr</td>
-    <td style="white-space: nowrap; text-align: right">3.64</td>
-    <td style="white-space: nowrap; text-align: right">274.95 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;0.71%</td>
-    <td style="white-space: nowrap; text-align: right">275.05 ms</td>
-    <td style="white-space: nowrap; text-align: right">278.58 ms</td>
+    <td style="white-space: nowrap; text-align: right">3.50</td>
+    <td style="white-space: nowrap; text-align: right">286.06 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;0.60%</td>
+    <td style="white-space: nowrap; text-align: right">286.03 ms</td>
+    <td style="white-space: nowrap; text-align: right">289.08 ms</td>
   </tr>
 
 </table>
@@ -93,14 +93,14 @@ Run Time Comparison
     <th style="text-align: right">Slower</th>
   <tr>
     <td style="white-space: nowrap">Jason</td>
-    <td style="white-space: nowrap;text-align: right">279.16</td>
+    <td style="white-space: nowrap;text-align: right">273.46</td>
     <td>&nbsp;</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">Ymlr</td>
-    <td style="white-space: nowrap; text-align: right">3.64</td>
-    <td style="white-space: nowrap; text-align: right">76.76x</td>
+    <td style="white-space: nowrap; text-align: right">3.50</td>
+    <td style="white-space: nowrap; text-align: right">78.23x</td>
   </tr>
 
 </table>
@@ -122,8 +122,8 @@ Memory Usage
   </tr>
     <tr>
     <td style="white-space: nowrap">Ymlr</td>
-    <td style="white-space: nowrap">65.74 MB</td>
-    <td>13.68x</td>
+    <td style="white-space: nowrap">67.38 MB</td>
+    <td>14.02x</td>
   </tr>
 </table>
 
@@ -145,20 +145,20 @@ Run Time
 
   <tr>
     <td style="white-space: nowrap">Jason</td>
-    <td style="white-space: nowrap; text-align: right">122.70</td>
-    <td style="white-space: nowrap; text-align: right">8.15 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;14.44%</td>
-    <td style="white-space: nowrap; text-align: right">7.75 ms</td>
-    <td style="white-space: nowrap; text-align: right">13.64 ms</td>
+    <td style="white-space: nowrap; text-align: right">127.15</td>
+    <td style="white-space: nowrap; text-align: right">7.86 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;14.06%</td>
+    <td style="white-space: nowrap; text-align: right">7.44 ms</td>
+    <td style="white-space: nowrap; text-align: right">13.61 ms</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">Ymlr</td>
-    <td style="white-space: nowrap; text-align: right">21.67</td>
-    <td style="white-space: nowrap; text-align: right">46.15 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;20.12%</td>
-    <td style="white-space: nowrap; text-align: right">46.06 ms</td>
-    <td style="white-space: nowrap; text-align: right">61.63 ms</td>
+    <td style="white-space: nowrap; text-align: right">22.26</td>
+    <td style="white-space: nowrap; text-align: right">44.91 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;19.91%</td>
+    <td style="white-space: nowrap; text-align: right">44.52 ms</td>
+    <td style="white-space: nowrap; text-align: right">58.06 ms</td>
   </tr>
 
 </table>
@@ -173,14 +173,14 @@ Run Time Comparison
     <th style="text-align: right">Slower</th>
   <tr>
     <td style="white-space: nowrap">Jason</td>
-    <td style="white-space: nowrap;text-align: right">122.70</td>
+    <td style="white-space: nowrap;text-align: right">127.15</td>
     <td>&nbsp;</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">Ymlr</td>
-    <td style="white-space: nowrap; text-align: right">21.67</td>
-    <td style="white-space: nowrap; text-align: right">5.66x</td>
+    <td style="white-space: nowrap; text-align: right">22.26</td>
+    <td style="white-space: nowrap; text-align: right">5.71x</td>
   </tr>
 
 </table>
@@ -225,20 +225,20 @@ Run Time
 
   <tr>
     <td style="white-space: nowrap">Jason</td>
-    <td style="white-space: nowrap; text-align: right">376.78</td>
-    <td style="white-space: nowrap; text-align: right">2.65 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;3.50%</td>
-    <td style="white-space: nowrap; text-align: right">2.64 ms</td>
-    <td style="white-space: nowrap; text-align: right">2.87 ms</td>
+    <td style="white-space: nowrap; text-align: right">391.80</td>
+    <td style="white-space: nowrap; text-align: right">2.55 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;4.91%</td>
+    <td style="white-space: nowrap; text-align: right">2.57 ms</td>
+    <td style="white-space: nowrap; text-align: right">2.94 ms</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">Ymlr</td>
-    <td style="white-space: nowrap; text-align: right">5.40</td>
-    <td style="white-space: nowrap; text-align: right">185.32 ms</td>
-    <td style="white-space: nowrap; text-align: right">&plusmn;0.98%</td>
-    <td style="white-space: nowrap; text-align: right">184.82 ms</td>
-    <td style="white-space: nowrap; text-align: right">190.55 ms</td>
+    <td style="white-space: nowrap; text-align: right">4.93</td>
+    <td style="white-space: nowrap; text-align: right">202.80 ms</td>
+    <td style="white-space: nowrap; text-align: right">&plusmn;1.12%</td>
+    <td style="white-space: nowrap; text-align: right">202.63 ms</td>
+    <td style="white-space: nowrap; text-align: right">208.55 ms</td>
   </tr>
 
 </table>
@@ -253,14 +253,14 @@ Run Time Comparison
     <th style="text-align: right">Slower</th>
   <tr>
     <td style="white-space: nowrap">Jason</td>
-    <td style="white-space: nowrap;text-align: right">376.78</td>
+    <td style="white-space: nowrap;text-align: right">391.80</td>
     <td>&nbsp;</td>
   </tr>
 
   <tr>
     <td style="white-space: nowrap">Ymlr</td>
-    <td style="white-space: nowrap; text-align: right">5.40</td>
-    <td style="white-space: nowrap; text-align: right">69.83x</td>
+    <td style="white-space: nowrap; text-align: right">4.93</td>
+    <td style="white-space: nowrap; text-align: right">79.46x</td>
   </tr>
 
 </table>
@@ -282,7 +282,7 @@ Memory Usage
   </tr>
     <tr>
     <td style="white-space: nowrap">Ymlr</td>
-    <td style="white-space: nowrap">52.62 MB</td>
-    <td>20.69x</td>
+    <td style="white-space: nowrap">65.35 MB</td>
+    <td>25.69x</td>
   </tr>
 </table>
