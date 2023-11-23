@@ -130,8 +130,11 @@ defmodule Ymlr.EncodeTest do
         ~S("  \_ \N \L \P")
       )
 
-      # Possible formats: \x13 \u0013 \U00000013. We use \x13
-      assert_identity_and_output("\u0013", "\"\\x13\"")
+      # Possible formats: \x13 \u0013 \U00000013.
+      assert_identity_and_output(
+        "\u0013\uFFFD\uFFFE\u{10FFFF}",
+        "\"\\x13\uFFFD\\uFFFE\u{10FFFF}\""
+      )
     end
 
     test "quoted strings - in map key (requires escape char)" do
