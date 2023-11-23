@@ -125,12 +125,18 @@ defmodule Ymlr.Encode do
                      # Printable ASCII
                      Enum.to_list(0x20..0x7E),
                      # Basic Multilingual Plane (BMP)
-                     Enum.to_list(0xA0..0xFF)
+                     Enum.to_list(0xA0..0xD7FF),
+                     Enum.to_list(0xE000..0xFFFD),
+                     # 32 bit
+                     Enum.to_list(0x010000..0x10FFFF)
                    ])
 
+  @not_supported_by_elixir Enum.to_list(0xD800..0xDFFF)
+
   # Non-Printable Characters (8-bit only for now) - all chars minus union of printable and escape chars:
-  @non_printable_chars Enum.to_list(0x00..0xFF) --
-                         (@printable_chars ++ @escape_if_within_double_quotes)
+  @non_printable_chars Enum.to_list(0..0x10FFFF) --
+                         (@printable_chars ++
+                            @escape_if_within_double_quotes ++ @not_supported_by_elixir)
 
   # Chars that, if contained within, force the string to be double-quoted:
   @chars_forcing_double_quotes_strings Enum.map(
@@ -312,7 +318,13 @@ defmodule Ymlr.Encode do
   end
 
   for uchar <- @non_printable_chars do
-    unicode_sequence = List.to_string(:io_lib.format("\\x~2.16.0B", [uchar]))
+    unicode_sequence =
+      case uchar do
+        uchar when uchar <= 0xFF -> List.to_string(:io_lib.format("\\x~2.16.0B", [uchar]))
+        uchar when uchar <= 0xFFFF -> List.to_string(:io_lib.format("\\u~4.16.0B", [uchar]))
+        uchar -> List.to_string(:io_lib.format("\\U~6.16.0B", [uchar]))
+      end
+
     defp escape_char(unquote(uchar)), do: unquote(unicode_sequence)
   end
 
