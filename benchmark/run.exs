@@ -37,7 +37,6 @@ Benchee.run(
     "Jason" => fn input -> Jason.encode!(input) end,
     "Ymlr" => fn input -> Ymlr.document!(input) end
   },
-  memory_time: 60,
   inputs: inputs,
   formatters: [
     {Benchee.Formatters.Markdown, file: "../BENCHMARK.md"},

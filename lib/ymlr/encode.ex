@@ -65,9 +65,7 @@ defmodule Ymlr.Encode do
 
   alias Ymlr.Encoder
 
-  # credo:disable-for-this-file Credo.Check.Refactor.CyclomaticComplexity
-
-  @quote_when_first [
+  @quote_when_starts_with_strings [
     # tag
     "!",
     # anchor
@@ -92,58 +90,52 @@ defmodule Ymlr.Encode do
     "`",
     # double and single quotes
     "\"",
-    "'"
+    "- ",
+    ": ",
+    ":{",
+    "? ",
+    "0b",
+    "0o",
+    "0x"
   ]
 
-  @quote_when_last [
-    # colon
-    ":"
+  @quote_when_contains_string [" #", ": "]
+
+  @quote_when_last_char ~c":"
+
+  @single_quote_when_exact [
+    "",
+    "~",
+    "null",
+    "yes",
+    "no",
+    "true",
+    "false",
+    "True",
+    "False"
   ]
 
   # Escape chars that, if contained within, force the string to be double-quoted:
-  @escape_chars_forcing_double_quotes ~c"\a\b\e\f\r\v\0\u00a0\u0085\u2028\u2029"
+  @escape_chars ~c"\a\b\e\f\r\v\0\u00a0\u0085\u2028\u2029\"\\"
+  @escaped_chars ~c"abefrv0_NLP\"\\"
+  @escape_if_within_double_quotes_mapping Enum.zip(@escape_chars, @escaped_chars)
 
-  # Chars that have to be escaped if within double quotes:
-  @escape_if_within_double_quotes @escape_chars_forcing_double_quotes ++ ~c"\"\\"
+  # Chars that need to be escaped if they occur whithin double quotes
+  defguard escape_if_withing_double_quotes(char) when char in @escape_chars
 
-  # mapping char => escape char.
-  @escape_if_within_double_quotes_mapping Enum.zip(
-                                            @escape_if_within_double_quotes,
-                                            ~c"abefrv0_NLP\"\\"
-                                          )
+  # Printable Characters:
+  defguard is_printable(char)
+           when char in 0x20..0x7E or char in ~c"\t\n\u0085" or char in 0xA0..0xFFFD or
+                  char in 0x010000..0x10FFFF
 
-  # Printable Characters (8-bit only for now):
-  @printable_chars List.flatten([
-                     # Tab (\t)
-                     0x09,
-                     # Line feed (LF \n)
-                     0x0A,
-                     # Carriage Return (CR \r)
-                     # 0x0D, theoretically printable, seems to require double quotes.
-                     # Next Line (NEL)
-                     0x85,
-                     # Printable ASCII
-                     Enum.to_list(0x20..0x7E),
-                     # Basic Multilingual Plane (BMP)
-                     Enum.to_list(0xA0..0xD7FF),
-                     Enum.to_list(0xE000..0xFFFD),
-                     # 32 bit
-                     Enum.to_list(0x010000..0x10FFFF)
-                   ])
-
-  @not_supported_by_elixir Enum.to_list(0xD800..0xDFFF)
-
-  # Non-Printable Characters (8-bit only for now) - all chars minus union of printable and escape chars:
-  @non_printable_chars Enum.to_list(0..0x10FFFF) --
-                         (@printable_chars ++
-                            @escape_if_within_double_quotes ++ @not_supported_by_elixir)
+  # Characters that need to be escaped as unicode \xHH or \uHHHH or \UHHHHHH:
+  defguard requires_unicode_escape(char)
+           when not is_printable(char) and char not in @escape_chars
 
   # Chars that, if contained within, force the string to be double-quoted:
-  @chars_forcing_double_quotes_strings Enum.map(
-                                         @non_printable_chars ++
-                                           @escape_chars_forcing_double_quotes,
-                                         &<<&1::utf8>>
-                                       )
+  @escape_chars_forcing_double_quotes @escape_chars -- ~c"\"\\"
+  defguard force_double_quote(char)
+           when not is_printable(char) or char in @escape_chars_forcing_double_quotes
 
   @doc ~S"""
   Encodes the given data as YAML string. Raises if it cannot be encoded.
@@ -221,7 +213,7 @@ defmodule Ymlr.Encode do
 
     data
     |> Enum.map(fn
-      nil -> "-"
+      nil -> ?-
       "" -> ~s(- "")
       value -> ["- " | Encoder.encode(value, indent_level + 1, opts)]
     end)
@@ -237,12 +229,12 @@ defmodule Ymlr.Encode do
   @spec number(number()) :: iodata()
   def number(data), do: "#{data}"
 
-  defp encode_map_key_atoms(data) when is_atom(data), do: [":", Atom.to_string(data), ":"]
+  defp encode_map_key_atoms(data) when is_atom(data), do: [?:, Atom.to_string(data), ?:]
   defp encode_map_key_atoms(data), do: encode_map_key(data)
 
-  defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ":"]
-  defp encode_map_key(data) when is_binary(data), do: [encode_binary(data, nil), ":"]
-  defp encode_map_key(data) when is_number(data), do: "#{data}:"
+  defp encode_map_key(data) when is_atom(data), do: [Atom.to_string(data), ?:]
+  defp encode_map_key(data) when is_binary(data), do: [encode_binary(data, nil), ?:]
+  defp encode_map_key(data) when is_number(data), do: ["#{data}:"]
 
   defp encode_map_key(data),
     do:
@@ -250,93 +242,108 @@ defmodule Ymlr.Encode do
         message: "The given data #{inspect(data)} cannot be converted to YAML (map key)."
       )
 
+  for data <- @single_quote_when_exact do
+    encoded = ~s('#{data}')
+    defp encode_binary(unquote(data), _), do: unquote(encoded)
+  end
+
+  defp encode_binary("\n", _), do: ~S("\n")
+
   defp encode_binary(data, indent_level) do
-    cond do
-      data == "" -> ~S('')
-      data == "~" -> ~S('~')
-      data == "\n" -> ~S("\n")
-      data == "null" -> ~S('null')
-      data == "yes" -> ~S('yes')
-      data == "no" -> ~S('no')
-      data == "true" -> ~S('true')
-      data == "false" -> ~S('false')
-      data == "True" -> ~S('True')
-      data == "False" -> ~S('False')
-      String.contains?(data, "\n") -> multiline(data, indent_level)
-      String.contains?(data, @chars_forcing_double_quotes_strings) -> with_double_quotes(data)
-      String.at(data, 0) in @quote_when_first -> with_quotes(data)
-      String.at(data, -1) in @quote_when_last -> with_quotes(data)
-      String.starts_with?(data, "- ") -> with_quotes(data)
-      String.starts_with?(data, ": ") -> with_quotes(data)
-      String.starts_with?(data, ":{") -> with_quotes(data)
-      String.starts_with?(data, "? ") -> with_quotes(data)
-      String.contains?(data, " #") -> with_quotes(data)
-      String.contains?(data, ": ") -> with_quotes(data)
-      String.starts_with?(data, "0b") -> with_quotes(data)
-      String.starts_with?(data, "0o") -> with_quotes(data)
-      String.starts_with?(data, "0x") -> with_quotes(data)
-      is_numeric(data) -> with_quotes(data)
-      true -> data
+    case string_encoding_type(data) do
+      :multiline -> multiline(data, indent_level)
+      :double_quoted -> with_double_quotes(data)
+      :single_quoted -> with_single_quotes(data)
+      _ -> data
     end
   end
 
-  defp is_numeric(string) do
-    case Float.parse(string) do
-      {_, ""} -> true
-      _ -> false
-    end
-  rescue
-    #  Apparently not needed anymore since Elixir 1.14. Left in for bc but stop covering.
-    # coveralls-ignore-start
-    _ ->
-      false
-      # coveralls-ignore-stop
+  defp string_encoding_type(<<?', rest::binary>>) do
+    do_string_encoding_type(rest, :double_quoted)
   end
 
-  defp with_quotes(data) do
-    if String.contains?(data, "'") do
-      with_double_quotes(data)
+  for data <- @quote_when_starts_with_strings do
+    defp string_encoding_type(<<unquote(data), rest::binary>>) do
+      do_string_encoding_type(rest, :single_quoted)
+    end
+  end
+
+  defp string_encoding_type(data) do
+    if is_numeric(data) do
+      :single_quoted
     else
-      with_single_quotes(data)
+      do_string_encoding_type(data, nil)
     end
   end
 
-  defp with_double_quotes(data) do
-    ~s("#{escape(data)}")
+  defp do_string_encoding_type(<<?\n, _::binary>>, _), do: :multiline
+
+  defp do_string_encoding_type(<<char::utf8, rest::binary>>, _)
+       when force_double_quote(char) do
+    do_string_encoding_type(rest, :double_quoted)
   end
 
-  defp with_single_quotes(data), do: ~s('#{data}')
+  defp do_string_encoding_type(<<?', rest::binary>>, nil) do
+    do_string_encoding_type(rest, :maybe_double_quoted)
+  end
+
+  defp do_string_encoding_type(<<?', rest::binary>>, _) do
+    do_string_encoding_type(rest, :double_quoted)
+  end
+
+  for data <- @quote_when_contains_string do
+    defp do_string_encoding_type(<<unquote(data)::utf8, rest::binary>>, :maybe_double_quoted) do
+      do_string_encoding_type(rest, :double_quoted)
+    end
+
+    defp do_string_encoding_type(<<unquote(data)::utf8, rest::binary>>, _quotation) do
+      do_string_encoding_type(rest, :single_quoted)
+    end
+  end
+
+  defp do_string_encoding_type(<<char::utf8>>, _quotation) when char in @quote_when_last_char do
+    :single_quoted
+  end
+
+  defp do_string_encoding_type(<<_::utf8, rest::binary>>, quotation) do
+    do_string_encoding_type(rest, quotation)
+  end
+
+  defp do_string_encoding_type(_, quotation), do: quotation
+
+  defp with_double_quotes(data), do: [?", escape(data), ?"]
+  defp with_single_quotes(data), do: [?', data, ?']
 
   defp escape(data) do
-    for <<char::utf8 <- data>> do
-      escape_char(char)
-    end
+    for <<char::utf8 <- data>>, do: escape_char(char)
   end
 
-  for {char, escaped} <- @escape_if_within_double_quotes_mapping do
-    defp escape_char(unquote(char)), do: <<?\\, unquote(escaped)>>
+  for {char, escape_char} <- @escape_if_within_double_quotes_mapping do
+    escaped = <<?\\, escape_char>>
+    defp escape_char(unquote(char)), do: unquote(escaped)
   end
 
-  for uchar <- @non_printable_chars do
-    unicode_sequence =
-      case uchar do
-        uchar when uchar <= 0xFF -> List.to_string(:io_lib.format("\\x~2.16.0B", [uchar]))
-        uchar when uchar <= 0xFFFF -> List.to_string(:io_lib.format("\\u~4.16.0B", [uchar]))
-        uchar -> List.to_string(:io_lib.format("\\U~6.16.0B", [uchar]))
-      end
+  defp escape_char(char) when requires_unicode_escape(char) and char <= 0xFF,
+    do: List.to_string(:io_lib.format("\\x~2.16.0B", [char]))
 
-    defp escape_char(unquote(uchar)), do: unquote(unicode_sequence)
-  end
+  defp escape_char(char) when requires_unicode_escape(char) and char in 0x0100..0xFFFF,
+    do: List.to_string(:io_lib.format("\\u~4.16.0B", [char]))
 
-  defp escape_char(char), do: char
+  defp escape_char(char) when requires_unicode_escape(char),
+    do: List.to_string(:io_lib.format("\\U~6.16.0B", [char]))
+
+  defp escape_char(char), do: <<char::utf8>>
 
   # for example for map keys
   defp multiline(data, nil), do: inspect(data)
   # see https://yaml-multiline.info/
+
+  # This is pure aesthetics: If we are on level 0 (no indentation), we add one
+  # level of indentation to make it look a bit nicer.
+  defp multiline(data, 0), do: multiline(data, 1)
+
   defp multiline(data, level) do
-    # This is pure aesthetics: If we are on level 0 (no indentation), we add one
-    # level of indentation to make it look a bit nicer.
-    indentation = indent(if level == 0, do: 1, else: level)
+    indentation = indent(level)
 
     block =
       data
@@ -361,7 +368,23 @@ defmodule Ymlr.Encode do
     end
   end
 
-  defp indent(level) do
-    ["\n" | List.duplicate("  ", level)]
+  for level <- 1..10 do
+    result = IO.iodata_to_binary(["\n" | List.duplicate("  ", level)])
+    defp indent(unquote(level)), do: unquote(result)
+  end
+
+  defp indent(level), do: ["\n" | List.duplicate("  ", level)]
+
+  defp is_numeric(string) do
+    case Float.parse(string) do
+      {_, ""} -> true
+      _ -> false
+    end
+  rescue
+    #  Apparently not needed anymore since Elixir 1.14. Left in for bc but stop covering.
+    # coveralls-ignore-start
+    _ ->
+      false
+      # coveralls-ignore-stop
   end
 end
