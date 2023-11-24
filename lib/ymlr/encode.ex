@@ -120,9 +120,7 @@ defmodule Ymlr.Encode do
   @escaped_chars ~c"abefrv0_NLP\"\\"
   @escape_if_within_double_quotes_mapping Enum.zip(@escape_chars, @escaped_chars)
 
-  # Chars that need to be escaped if they occur whithin double quotes
-  defguard escape_if_withing_double_quotes(char) when char in @escape_chars
-
+  # coveralls-ignore-start - trivial code
   # Printable Characters:
   defguard is_printable(char)
            when char in 0x20..0x7E or char in ~c"\t\n\u0085" or char in 0xA0..0xFFFD or
@@ -136,6 +134,8 @@ defmodule Ymlr.Encode do
   @escape_chars_forcing_double_quotes @escape_chars -- ~c"\"\\"
   defguard force_double_quote(char)
            when not is_printable(char) or char in @escape_chars_forcing_double_quotes
+
+  # coveralls-ignore-stop
 
   @doc ~S"""
   Encodes the given data as YAML string. Raises if it cannot be encoded.
@@ -329,8 +329,11 @@ defmodule Ymlr.Encode do
   defp escape_char(char) when requires_unicode_escape(char) and char in 0x0100..0xFFFF,
     do: List.to_string(:io_lib.format("\\u~4.16.0B", [char]))
 
+  # coveralls-ignore-start - We don't use this function currently.
   defp escape_char(char) when requires_unicode_escape(char),
     do: List.to_string(:io_lib.format("\\U~6.16.0B", [char]))
+
+  # coveralls-ignore-stop
 
   defp escape_char(char), do: <<char::utf8>>
 

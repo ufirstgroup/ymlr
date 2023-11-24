@@ -80,6 +80,13 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("some:entry:", ~S('some:entry:'))
     end
 
+    test "quoted strings - specialties inside the string" do
+      assert_identity_and_output("some: entry", ~S('some: entry'))
+      assert_identity_and_output("some #entry", ~S('some #entry'))
+      assert_identity_and_output("s'ome: entry", ~S("s'ome: entry"))
+      assert_identity_and_output("s'ome #entry", ~S("s'ome #entry"))
+    end
+
     test "quoted strings - tab char with and without quotes" do
       assert_identity_and_output("a\tb", ~s(a\tb))
       assert_identity_and_output("!a\tb", ~s('!a\tb'))
