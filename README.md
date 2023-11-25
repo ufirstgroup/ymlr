@@ -124,6 +124,6 @@ You can find the last Benchmark in [BENCHMARK.md](BENCHMARK.md)
 ### Running the script
 
 ```bash
-cd benachmar
+cd benchmark/
 elixir run.exs
 ```
