@@ -132,8 +132,9 @@ defmodule Ymlr.EncodeTest do
 
       # Possible formats: \x13 \u0013 \U00000013.
       assert_identity_and_output(
-        "\u0013\uFFFD\uFFFE\u{10FFFF}",
-        "\"\\x13\uFFFD\\uFFFE\u{10FFFF}\""
+        # last character is "\u{20046}"
+        "\u0013\uFFFD\uFFFE𠁆",
+        "\"\\x13\uFFFD\\uFFFE𠁆\""
       )
     end
 
