@@ -96,8 +96,27 @@ defmodule Ymlr.Encode do
     "? ",
     "0b",
     "0o",
-    "0x"
+    "0x",
+    ".inf",
+    ".Inf",
+    ".INF",
+    "+.inf",
+    "+.Inf",
+    "+.INF",
+    "-.inf",
+    "-.Inf",
+    "-.INF",
+    ".nan",
+    ".Nan",
+    ".NAN"
   ]
+
+  @special_atom_mapping %{
+    :nan => ".nan",
+    :inf => ".inf",
+    :"-inf" => "-.inf",
+    :"+inf" => ".inf"
+  }
 
   @quote_when_contains_string [" #", ": "]
 
@@ -223,6 +242,10 @@ defmodule Ymlr.Encode do
   end
 
   @spec atom(atom()) :: iodata()
+  for {input, encoded} <- @special_atom_mapping do
+    def atom(unquote(input)), do: unquote(encoded)
+  end
+
   def atom(data), do: Atom.to_string(data)
 
   @spec string(binary(), integer) :: iodata()
