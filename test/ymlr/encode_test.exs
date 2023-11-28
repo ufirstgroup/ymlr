@@ -38,6 +38,18 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("0o777", ~S('0o777'))
       assert_identity_and_output("0x1F", ~S('0x1F'))
       assert_identity_and_output("null", ~S('null'))
+      assert_identity_and_output(".inf", ~S('.inf'))
+      assert_identity_and_output(".Inf", ~S('.Inf'))
+      assert_identity_and_output(".INF", ~S('.INF'))
+      assert_identity_and_output("-.inf", ~S('-.inf'))
+      assert_identity_and_output("-.Inf", ~S('-.Inf'))
+      assert_identity_and_output("-.INF", ~S('-.INF'))
+      assert_identity_and_output("+.inf", ~S('+.inf'))
+      assert_identity_and_output("+.Inf", ~S('+.Inf'))
+      assert_identity_and_output("+.INF", ~S('+.INF'))
+      assert_identity_and_output(".nan", ~S('.nan'))
+      assert_identity_and_output(".Nan", ~S('.Nan'))
+      assert_identity_and_output(".NAN", ~S('.NAN'))
     end
 
     test "quoted strings - avoid mapping confusion" do
@@ -196,6 +208,10 @@ defmodule Ymlr.EncodeTest do
 
     test "floats" do
       assert_identity_and_output(1.2, "1.2")
+      assert_identity_and_output(:nan, ".nan")
+      assert_output(:inf, ".inf")
+      assert_identity_and_output(:"+inf", ".inf")
+      assert_identity_and_output(:"-inf", "-.inf")
     end
 
     test "decimals" do
