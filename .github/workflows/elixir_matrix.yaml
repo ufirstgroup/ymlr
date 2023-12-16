@@ -14,33 +14,29 @@ jobs:
       # see https://hexdocs.pm/elixir/compatibility-and-deprecations.html#compatibility-between-elixir-and-erlang-otp
       matrix:
         otp: ["22.x", "23.x", "24.x", "25.x", 26.x]
-        elixir: ["1.10.x", "1.11.x", "1.12.x", "1.13.x", "1.14.x", "1.15.x"]
+        elixir: ["1.11.x", "1.12.x", "1.13.x", "1.14.x", "1.15.x", "1.16.x"]
         exclude:
           # OTP 22
           - elixir: "1.14.x"
             otp: "22.x"
           - elixir: "1.15.x"
             otp: "22.x"
+          - elixir: "1.16.x"
+            otp: "22.x"
           # OTP 23
-          - elixir: "1.10.x"
-            otp: "23.x"
           - elixir: "1.15.x"
             otp: "23.x"
+          - elixir: "1.16.x"
+            otp: "23.x"
           # OTP 24
-          - elixir: "1.10.x"
-            otp: "24.x"
           - elixir: "1.11.x"
             otp: "24.x"
           # OTP 25
-          - elixir: "1.10.x"
-            otp: "25.x"
           - elixir: "1.11.x"
             otp: "25.x"
           - elixir: "1.12.x"
             otp: "25.x"
           # OTP 26
-          - elixir: "1.10.x"
-            otp: "26.x"
           - elixir: "1.11.x"
             otp: "26.x"
           - elixir: "1.12.x"
