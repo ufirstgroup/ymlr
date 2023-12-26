@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Support for escape and unicode characters [#98](https://github.com/ufirstgroup/ymlr/pull/98)
 - Refactor `Ymlr.Encode` to make it faster.
 
+### Fixed
+
+- Put single quotes around '?' when it is the entire value.
+
 <!--------------------- Don't add new entries after this line --------------------->
 
 ### Added
