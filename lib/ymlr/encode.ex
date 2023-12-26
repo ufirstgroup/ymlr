@@ -106,6 +106,7 @@ defmodule Ymlr.Encode do
   @single_quote_when_exact [
     "",
     "~",
+    "?",
     "null",
     "yes",
     "no",

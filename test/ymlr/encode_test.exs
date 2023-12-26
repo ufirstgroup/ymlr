@@ -49,6 +49,7 @@ defmodule Ymlr.EncodeTest do
     end
 
     test "quoted strings - starts with special char" do
+      assert_identity_and_output("?", ~S('?'))
       assert_identity_and_output("!tag", ~S('!tag'))
       assert_identity_and_output("&anchor", ~S('&anchor'))
       assert_identity_and_output("*alias", ~S('*alias'))
