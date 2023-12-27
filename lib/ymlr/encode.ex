@@ -107,6 +107,8 @@ defmodule Ymlr.Encode do
     "",
     "~",
     "?",
+    "-",
+    ":",
     "null",
     "yes",
     "no",
