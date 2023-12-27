@@ -15,16 +15,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Support for escape and unicode characters [#98](https://github.com/ufirstgroup/ymlr/pull/98)
 - Refactor `Ymlr.Encode` to make it faster [#171](https://github.com/ufirstgroup/ymlr/pull/171).
 - Handle special floats `.Inf` and `.Nan`. [#170](https://github.com/ufirstgroup/ymlr/issues/170), [#172](https://github.com/ufirstgroup/ymlr/issues/172)
+- Script for benchmarking
 
 ### Fixed
 
 - Put single quotes around indicator chars when it is the entire value. [#177](https://github.com/ufirstgroup/ymlr/issues/177), [#178](https://github.com/ufirstgroup/ymlr/pull/178)
 
 <!--------------------- Don't add new entries after this line --------------------->
-
-### Added
-
-- Script for benchmarking
 
 ## [5.0.0] - 2023-11-03
 
