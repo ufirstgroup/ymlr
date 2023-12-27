@@ -48,8 +48,31 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("hello #world", ~S('hello #world'))
     end
 
-    test "quoted strings - starts with special char" do
+    test "quoted strings - indicator characters on their own" do
+      assert_identity_and_output("-", ~S('-'))
       assert_identity_and_output("?", ~S('?'))
+      assert_identity_and_output(":", ~S(':'))
+      assert_identity_and_output("[", ~S('['))
+      assert_identity_and_output("]", ~S(']'))
+      assert_identity_and_output("{", ~S('{'))
+      assert_identity_and_output("}", ~S('}'))
+      assert_identity_and_output("#", ~S('#'))
+      assert_identity_and_output("&", ~S('&'))
+      assert_identity_and_output("&", ~S('&'))
+      assert_identity_and_output("*", ~S('*'))
+      assert_identity_and_output("*", ~S('*'))
+      assert_identity_and_output("!", ~S('!'))
+      assert_identity_and_output("!", ~S('!'))
+      assert_identity_and_output("|", ~S('|'))
+      assert_identity_and_output("|", ~S('|'))
+      assert_identity_and_output(">", ~S('>'))
+      assert_identity_and_output(">", ~S('>'))
+      assert_identity_and_output("%", ~S(%))
+      assert_identity_and_output("@", ~S('@'))
+      assert_identity_and_output("`", ~S('`'))
+    end
+    
+    test "quoted strings - starts with special char" do
       assert_identity_and_output("!tag", ~S('!tag'))
       assert_identity_and_output("&anchor", ~S('&anchor'))
       assert_identity_and_output("*alias", ~S('*alias'))
