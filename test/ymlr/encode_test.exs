@@ -18,6 +18,14 @@ defmodule Ymlr.EncodeTest do
     test "plain strings" do
       assert_identity_and_output("hello world", "hello world")
       assert_identity_and_output("that's it", "that's it")
+
+      # Strings where the ":", "?", or "-" indicator character is used as the
+      # first character may be encoded in Plain Style (without being quoted)
+      # if followed by a non-space “safe” character.
+      # https://yaml.org/spec/1.2.2/#733-plain-style
+      assert_identity_and_output("?x", ~S(?x))
+      assert_identity_and_output(":x", ~S(:x))
+      assert_identity_and_output("-x", ~S(-x))
     end
 
     # see http://blogs.perl.org/users/tinita/2018/03/strings-in-yaml---to-quote-or-not-to-quote.html
@@ -71,7 +79,7 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("@", ~S('@'))
       assert_identity_and_output("`", ~S('`'))
     end
-    
+
     test "quoted strings - starts with special char" do
       assert_identity_and_output("!tag", ~S('!tag'))
       assert_identity_and_output("&anchor", ~S('&anchor'))
