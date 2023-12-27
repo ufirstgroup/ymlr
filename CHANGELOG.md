@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- Put single quotes around '?' when it is the entire value.
+- Put single quotes around indicator chars when it is the entire value. [#177](https://github.com/ufirstgroup/ymlr/issues/177), [#178](https://github.com/ufirstgroup/ymlr/pull/178)
 
 <!--------------------- Don't add new entries after this line --------------------->
 
