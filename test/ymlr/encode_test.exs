@@ -30,6 +30,21 @@ defmodule Ymlr.EncodeTest do
 
     # see http://blogs.perl.org/users/tinita/2018/03/strings-in-yaml---to-quote-or-not-to-quote.html
 
+    test "quoted strings - whitespace(s)" do
+      # only whitespace(s)
+      assert_identity_and_output(" ", ~S(' '))
+      assert_identity("  ")
+      # leading whitespace(s)
+      assert_identity(" leading")
+      assert_identity("  leading")
+      assert_identity_and_output(" '", ~S(" '"))
+      # trailing whitespace(s)
+      assert_identity("trailing ")
+      assert_identity("trailing  ")
+      assert_identity("a'  ")
+      assert_identity_and_output("' ", ~S("' "))
+    end
+
     test "quoted strings - avoid type confusion" do
       assert_identity_and_output("yes", ~S('yes'))
       assert_identity_and_output("no", ~S('no'))
@@ -122,6 +137,9 @@ defmodule Ymlr.EncodeTest do
 
     test "quoted strings - ends with colon" do
       assert_identity_and_output("some:entry:", ~S('some:entry:'))
+      # see https://github.com/ufirstgroup/ymlr/issues/179
+      assert_identity_and_output("a'b:", ~S("a'b:"))
+      assert_identity_and_output("a'b':", ~S("a'b':"))
     end
 
     test "quoted strings - specialties inside the string" do
@@ -129,6 +147,12 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("some #entry", ~S('some #entry'))
       assert_identity_and_output("s'ome: entry", ~S("s'ome: entry"))
       assert_identity_and_output("s'ome #entry", ~S("s'ome #entry"))
+    end
+
+    # see https://github.com/ufirstgroup/ymlr/issues/179
+    test "quoted strings - issue 179" do
+      assert_identity(~S{a'b': })
+      assert_identity(~S{'': })
     end
 
     test "quoted strings - tab char with and without quotes" do

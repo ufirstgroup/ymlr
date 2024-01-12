@@ -66,6 +66,7 @@ defmodule Ymlr.Encode do
   alias Ymlr.Encoder
 
   @quote_when_starts_with_strings [
+    " ",
     # tag
     "!",
     # anchor
@@ -120,7 +121,7 @@ defmodule Ymlr.Encode do
 
   @quote_when_contains_string [" #", ": "]
 
-  @quote_when_last_char ~c":"
+  @quote_when_last_char [?\s, ?:]
 
   @single_quote_when_exact [
     "",
@@ -317,6 +318,10 @@ defmodule Ymlr.Encode do
   end
 
   for data <- @quote_when_contains_string do
+    defp do_string_encoding_type(<<unquote(data)::utf8, rest::binary>>, :double_quoted) do
+      do_string_encoding_type(rest, :double_quoted)
+    end
+
     defp do_string_encoding_type(<<unquote(data)::utf8, rest::binary>>, :maybe_double_quoted) do
       do_string_encoding_type(rest, :double_quoted)
     end
@@ -326,8 +331,12 @@ defmodule Ymlr.Encode do
     end
   end
 
-  defp do_string_encoding_type(<<char::utf8>>, _quotation) when char in @quote_when_last_char do
-    :single_quoted
+  defp do_string_encoding_type(<<char::utf8>>, quotation) when char in @quote_when_last_char do
+    case quotation do
+      :double_quoted -> :double_quoted
+      :maybe_double_quoted -> :double_quoted
+      _ -> :single_quoted
+    end
   end
 
   defp do_string_encoding_type(<<_::utf8, rest::binary>>, quotation) do
