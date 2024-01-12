@@ -66,6 +66,7 @@ defmodule Ymlr.Encode do
   alias Ymlr.Encoder
 
   @quote_when_starts_with_strings [
+    " ",
     # tag
     "!",
     # anchor
@@ -323,6 +324,14 @@ defmodule Ymlr.Encode do
 
     defp do_string_encoding_type(<<unquote(data)::utf8, rest::binary>>, _quotation) do
       do_string_encoding_type(rest, :single_quoted)
+    end
+  end
+
+  defp do_string_encoding_type(" ", quotation) do
+    case quotation do
+      :double_quoted -> :double_quoted
+      :maybe_double_quoted -> :double_quoted
+      _ -> :single_quoted
     end
   end
 

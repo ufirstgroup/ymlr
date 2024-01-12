@@ -30,6 +30,20 @@ defmodule Ymlr.EncodeTest do
 
     # see http://blogs.perl.org/users/tinita/2018/03/strings-in-yaml---to-quote-or-not-to-quote.html
 
+    test "quoted strings - whitespace(s)" do
+      # only whitespace(s)
+      assert_identity_and_output(" ", ~S(' '))
+      assert_identity("  ")
+      # leading whitespace(s)
+      assert_identity(" leading")
+      assert_identity("  leading")
+      assert_identity_and_output(" '", ~S(" '"))
+      # trailing whitespace(s)
+      assert_identity("trailing ")
+      assert_identity("trailing  ")
+      assert_identity_and_output("' ", ~S("' "))
+    end
+
     test "quoted strings - avoid type confusion" do
       assert_identity_and_output("yes", ~S('yes'))
       assert_identity_and_output("no", ~S('no'))
