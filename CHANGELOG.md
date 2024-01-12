@@ -10,12 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+<!--------------------- Don't add new entries after this line --------------------->
+
+## [5.1.1] - 2024-01-12
+
 ### Fixed
 
 - handle quoted strings containing single quotes (should always use double quotes) [#179](https://github.com/ufirstgroup/ymlr/issues/179), [#181](https://github.com/ufirstgroup/ymlr/pull/181)
 - handle string with leading or trailing whitespaces [#180](https://github.com/ufirstgroup/ymlr/issues/180), [#181](https://github.com/ufirstgroup/ymlr/pull/181)
-
-<!--------------------- Don't add new entries after this line --------------------->
 
 ## [5.1.0] - 2023-12-27
 
