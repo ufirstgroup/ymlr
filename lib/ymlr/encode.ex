@@ -121,7 +121,7 @@ defmodule Ymlr.Encode do
 
   @quote_when_contains_string [" #", ": "]
 
-  @quote_when_last_char ~c" :"
+  @quote_when_last_char [?\s, ?:]
 
   @single_quote_when_exact [
     "",
