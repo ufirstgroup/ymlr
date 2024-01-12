@@ -41,6 +41,7 @@ defmodule Ymlr.EncodeTest do
       # trailing whitespace(s)
       assert_identity("trailing ")
       assert_identity("trailing  ")
+      assert_identity("a'  ")
       assert_identity_and_output("' ", ~S("' "))
     end
 
@@ -138,6 +139,7 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("some:entry:", ~S('some:entry:'))
       # see https://github.com/ufirstgroup/ymlr/issues/179
       assert_identity_and_output("a'b:", ~S("a'b:"))
+      assert_identity_and_output("a'b':", ~S("a'b':"))
     end
 
     test "quoted strings - specialties inside the string" do
