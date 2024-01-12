@@ -318,6 +318,10 @@ defmodule Ymlr.Encode do
   end
 
   for data <- @quote_when_contains_string do
+    defp do_string_encoding_type(<<unquote(data)::utf8, rest::binary>>, :double_quoted) do
+      do_string_encoding_type(rest, :double_quoted)
+    end
+
     defp do_string_encoding_type(<<unquote(data)::utf8, rest::binary>>, :maybe_double_quoted) do
       do_string_encoding_type(rest, :double_quoted)
     end

@@ -147,6 +147,12 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("s'ome #entry", ~S("s'ome #entry"))
     end
 
+    # see https://github.com/ufirstgroup/ymlr/issues/179
+    test "quoted strings - issue 179" do
+      assert_identity(~S{a'b': })
+      assert_identity(~S{'': })
+    end
+
     test "quoted strings - tab char with and without quotes" do
       assert_identity_and_output("a\tb", ~s(a\tb))
       assert_identity_and_output("!a\tb", ~s('!a\tb'))
