@@ -122,6 +122,8 @@ defmodule Ymlr.EncodeTest do
 
     test "quoted strings - ends with colon" do
       assert_identity_and_output("some:entry:", ~S('some:entry:'))
+      # see https://github.com/ufirstgroup/ymlr/issues/179
+      assert_identity_and_output("a'b:", ~S("a'b:"))
     end
 
     test "quoted strings - specialties inside the string" do

@@ -326,8 +326,12 @@ defmodule Ymlr.Encode do
     end
   end
 
-  defp do_string_encoding_type(<<char::utf8>>, _quotation) when char in @quote_when_last_char do
-    :single_quoted
+  defp do_string_encoding_type(<<char::utf8>>, quotation) when char in @quote_when_last_char do
+    case quotation do
+      :double_quoted -> :double_quoted
+      :maybe_double_quoted -> :double_quoted
+      _ -> :single_quoted
+    end
   end
 
   defp do_string_encoding_type(<<_::utf8, rest::binary>>, quotation) do
