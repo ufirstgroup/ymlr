@@ -121,7 +121,7 @@ defmodule Ymlr.Encode do
 
   @quote_when_contains_string [" #", ": "]
 
-  @quote_when_last_char ~c":"
+  @quote_when_last_char ~c" :"
 
   @single_quote_when_exact [
     "",
@@ -328,14 +328,6 @@ defmodule Ymlr.Encode do
 
     defp do_string_encoding_type(<<unquote(data)::utf8, rest::binary>>, _quotation) do
       do_string_encoding_type(rest, :single_quoted)
-    end
-  end
-
-  defp do_string_encoding_type(" ", quotation) do
-    case quotation do
-      :double_quoted -> :double_quoted
-      :maybe_double_quoted -> :double_quoted
-      _ -> :single_quoted
     end
   end
 
