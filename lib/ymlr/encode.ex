@@ -94,6 +94,7 @@ defmodule Ymlr.Encode do
     "- ",
     ": ",
     ":{",
+    "%",
     "? ",
     "0b",
     "0o",
