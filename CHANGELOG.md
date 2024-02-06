@@ -12,6 +12,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!--------------------- Don't add new entries after this line --------------------->
 
+## [5.1.2] - 2024-02-06
+
+### Fixed
+
+- quote strings strings starting with % [#184](https://github.com/ufirstgroup/ymlr/pull/184)
+
 ## [5.1.1] - 2024-01-12
 
 ### Fixed
