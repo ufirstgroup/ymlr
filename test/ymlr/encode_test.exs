@@ -102,7 +102,7 @@ defmodule Ymlr.EncodeTest do
       assert_identity_and_output("|", ~S('|'))
       assert_identity_and_output(">", ~S('>'))
       assert_identity_and_output(">", ~S('>'))
-      assert_identity_and_output("%", ~S(%))
+      assert_identity_and_output("%", ~S('%'))
       assert_identity_and_output("@", ~S('@'))
       assert_identity_and_output("`", ~S('`'))
     end
