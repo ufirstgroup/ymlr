@@ -14,7 +14,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         # elixir = pkgs.elixir;
         # elixir = pkgs.beam.packages.elixir;
-        elixir = pkgs.beam.packages.erlangR26.elixir_1_15;
+        elixir = pkgs.beam.packages.erlangR26.elixir_1_16;
 
       in {
         devShell = pkgs.mkShell {
