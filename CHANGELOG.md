@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- Quote all versions of booleans when given as strings [#188](https://github.com/ufirstgroup/ymlr/issues/188), [#189](https://github.com/ufirstgroup/ymlr/issues/189)
+- Quote all versions of booleans when given as strings [#188](https://github.com/ufirstgroup/ymlr/issues/188), [#190](https://github.com/ufirstgroup/ymlr/issues/190)
 
 <!--------------------- Don't add new entries after this line --------------------->
 
