@@ -37,7 +37,7 @@ jobs:
           - elixir: "1.13.x"
             otp: "26.x"
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.2
 
       - uses: erlef/setup-beam@v1
         id: beam
