@@ -130,12 +130,30 @@ defmodule Ymlr.Encode do
     "?",
     "-",
     "null",
+    "Null",
+    "NULL",
+    "y",
+    "Y",
+    "n",
+    "N",
     "yes",
+    "Yes",
+    "YES",
     "no",
+    "No",
+    "NO",
     "true",
-    "false",
     "True",
-    "False"
+    "TRUE",
+    "false",
+    "False",
+    "FALSE",
+    "on",
+    "On",
+    "ON",
+    "off",
+    "Off",
+    "OFF"
   ]
 
   # Escape chars that, if contained within, force the string to be double-quoted:
