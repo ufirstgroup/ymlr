@@ -6,11 +6,14 @@
 
     # nixpkgs-unstable
     # nixpkgs.url = "nixpkgs";
-    # when something is broken in nixpkgs-unstable we can fallback to latest nixos- stable
-    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/*.tar.gz";
-    # or maybe a certain version
+
+    # when something is broken in nixpkgs-unstable we can try to find a known good commit ...
+    nixpkgs.url = "nixpkgs/f8e2ebd66d097614d51a56a755450d4ae1632df1";
+    # ... or fallback to latest nixos- stable
+    # nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/*.tar.gz";
+    # ... or maybe a certain version
     # nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.2311.*.tar.gz";
-    # which should be the same as
+    # (which should be the same as)
     # nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
 
     flake-utils.url = "github:numtide/flake-utils";
