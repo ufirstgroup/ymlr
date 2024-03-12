@@ -2,7 +2,17 @@
   description = "Flake to manage elixir project";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # see https://zero-to-nix.com/concepts/flakes
+
+    # nixpkgs-unstable
+    # nixpkgs.url = "nixpkgs";
+    # when something is broken in nixpkgs-unstable we can fallback to latest nixos- stable
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/*.tar.gz";
+    # or maybe a certain version
+    # nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.2311.*.tar.gz";
+    # which should be the same as
+    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+
     flake-utils.url = "github:numtide/flake-utils";
   };
 
