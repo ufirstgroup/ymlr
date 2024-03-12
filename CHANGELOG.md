@@ -10,11 +10,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+<!--------------------- Don't add new entries after this line --------------------->
+
+## [5.1.3] - 2024-03-12
+
 ### Fixed
 
 - Quote all versions of booleans when given as strings [#188](https://github.com/ufirstgroup/ymlr/issues/188), [#190](https://github.com/ufirstgroup/ymlr/issues/190)
-
-<!--------------------- Don't add new entries after this line --------------------->
 
 ## [5.1.2] - 2024-02-06
 
