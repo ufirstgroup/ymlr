@@ -314,7 +314,7 @@ defmodule Ymlr.Encode do
   end
 
   defp string_encoding_type(data) do
-    if is_numeric(data) do
+    if numeric?(data) do
       :single_quoted
     else
       do_string_encoding_type(data, nil)
@@ -431,7 +431,7 @@ defmodule Ymlr.Encode do
 
   defp indent(level), do: ["\n" | List.duplicate("  ", level)]
 
-  defp is_numeric(string) do
+  defp numeric?(string) do
     case Float.parse(string) do
       {_, ""} -> true
       _ -> false
