@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+### Changed
+
+- Changed how Date, Time, NaiveDateTime, and DateTime are encode when nested in a map, fixes [#207](https://github.com/ufirstgroup/ymlr/issues/207)
+
 ### Fixed
 
 - fixed typo in spec: `idnent_level` => `indent_level`

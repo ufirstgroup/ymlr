@@ -571,6 +571,35 @@ defmodule Ymlr.EncodeTest do
       assert_output(~D[2016-05-24], "2016-05-24")
     end
 
+    test "date in map" do
+      assert_output(%{"d" => ~D[2016-05-24]}, "d: 2016-05-24")
+    end
+
+    test "date in list" do
+      assert_output([1, ~D[2016-05-24]], "- 1\n- 2016-05-24")
+    end
+
+    test "time" do
+      assert_output(~T[23:22:21], "23:22:21")
+      assert_output(~T[23:22:21.20], "23:22:21.20")
+    end
+
+    test "time in map" do
+      assert_output(%{"t" => ~T[01:02:03]}, "t: 01:02:03")
+    end
+
+    test "naivedatetime" do
+      assert_output(~N[2016-05-24 23:22:21], "2016-05-24T23:22:21")
+      assert_output(~N[2016-05-24 23:22:21.0], "2016-05-24T23:22:21.0")
+      assert_output(~N[2016-05-24 23:22:21.00], "2016-05-24T23:22:21.00")
+      assert_output(~N[2016-05-24 23:22:21.000], "2016-05-24T23:22:21.000")
+      assert_output(~N[2016-05-24 23:22:21.0000], "2016-05-24T23:22:21.0000")
+    end
+
+    test "naivedatetime in map" do
+      assert_output(%{"ts" => ~N[2016-05-24 13:26:08]}, "ts: 2016-05-24T13:26:08")
+    end
+
     test "datetime" do
       assert_output(~U[2016-05-24 13:26:08Z], "2016-05-24T13:26:08Z")
       assert_output(~U[2016-05-24 13:26:08.1Z], "2016-05-24T13:26:08.1Z")
@@ -578,5 +607,10 @@ defmodule Ymlr.EncodeTest do
       assert_output(~U[2016-05-24 13:26:08.003Z], "2016-05-24T13:26:08.003Z")
       assert_output(~U[2016-05-24 13:26:08.0004Z], "2016-05-24T13:26:08.0004Z")
     end
+
+    test "datetime in map" do
+      assert_output(%{"ts" => ~U[2016-05-24 13:26:08Z]}, "ts: 2016-05-24T13:26:08Z")
+    end
+
   end
 end

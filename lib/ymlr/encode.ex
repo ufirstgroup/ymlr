@@ -234,6 +234,18 @@ defmodule Ymlr.Encode do
       {key, value} when value == %{} ->
         [key_encoder.(key), " {}"]
 
+      {key, value} when is_struct(value, Date) ->
+        [key_encoder.(key), " " | Encoder.encode(value, indent_level, opts)]
+
+      {key, value} when is_struct(value, Time) ->
+        [key_encoder.(key), " " | Encoder.encode(value, indent_level, opts)]
+
+      {key, value} when is_struct(value, NaiveDateTime) ->
+        [key_encoder.(key), " " | Encoder.encode(value, indent_level, opts)]
+
+      {key, value} when is_struct(value, DateTime) ->
+        [key_encoder.(key), " " | Encoder.encode(value, indent_level, opts)]
+
       {key, value} when is_map(value) ->
         [key_encoder.(key), indentation, "  " | Encoder.encode(value, indent_level + 1, opts)]
 
