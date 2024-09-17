@@ -29,10 +29,10 @@ defprotocol Ymlr.Encoder do
 
   ```
   defimpl Ymlr.Encoder, for: Test do
-    def encode(data, idnent_level) do
+    def encode(data, indent_level) do
       data
       |> Map.take(unquote([:foo, :bar, :baz]))
-      |> Ymlr.Encode.map(idnent_level)
+      |> Ymlr.Encode.map(indent_level)
     end
   end
   ```
@@ -52,10 +52,10 @@ defprotocol Ymlr.Encoder do
 
   ```
   defimpl Ymlr.Encoder, for: Test do
-    def encode(data, idnent_level) do
+    def encode(data, indent_level) do
       data
       |> Map.take(unquote([:foo]))
-      |> Ymlr.Encode.map(idnent_level)
+      |> Ymlr.Encode.map(indent_level)
     end
   end
   ```
@@ -75,10 +75,10 @@ defprotocol Ymlr.Encoder do
 
   ```
   defimpl Ymlr.Encoder, for: Test do
-    def encode(data, idnent_level) do
+    def encode(data, indent_level) do
       data
       |> Map.take(unquote([:bar, :baz]))
-      |> Ymlr.Encode.map(idnent_level)
+      |> Ymlr.Encode.map(indent_level)
     end
   end
   ```
@@ -108,8 +108,8 @@ defprotocol Ymlr.Encoder do
   @doc """
   Encodes the given data to YAML.
   """
-  @spec encode(data :: term(), idnent_level :: integer(), opts :: opts()) :: iodata()
-  def encode(data, idnent_level, opts)
+  @spec encode(data :: term(), indent_level :: integer(), opts :: opts()) :: iodata()
+  def encode(data, indent_level, opts)
 end
 
 defimpl Ymlr.Encoder, for: Any do
@@ -123,13 +123,13 @@ defimpl Ymlr.Encoder, for: Any do
 
       quote do
         defimpl Ymlr.Encoder, for: unquote(module) do
-          def encode(data, idnent_level, opts) do
+          def encode(data, indent_level, opts) do
             data
             |> Map.from_struct()
             |> MapSet.new()
             |> MapSet.difference(unquote(defaults))
             |> Map.new()
-            |> Ymlr.Encode.map(idnent_level, opts)
+            |> Ymlr.Encode.map(indent_level, opts)
           end
         end
       end
@@ -138,10 +138,10 @@ defimpl Ymlr.Encoder, for: Any do
 
       quote do
         defimpl Ymlr.Encoder, for: unquote(module) do
-          def encode(data, idnent_level, opts) do
+          def encode(data, indent_level, opts) do
             data
             |> Map.take(unquote(fields))
-            |> Ymlr.Encode.map(idnent_level, opts)
+            |> Ymlr.Encode.map(indent_level, opts)
           end
         end
       end
@@ -210,7 +210,7 @@ defimpl Ymlr.Encoder, for: Any do
 end
 
 defimpl Ymlr.Encoder, for: Map do
-  def encode(data, idnent_level, opts), do: Ymlr.Encode.map(data, idnent_level, opts)
+  def encode(data, indent_level, opts), do: Ymlr.Encode.map(data, indent_level, opts)
 end
 
 defimpl Ymlr.Encoder, for: [Date, Time, NaiveDateTime] do
@@ -224,17 +224,17 @@ defimpl Ymlr.Encoder, for: DateTime do
 end
 
 defimpl Ymlr.Encoder, for: List do
-  def encode(data, idnent_level, opts), do: Ymlr.Encode.list(data, idnent_level, opts)
+  def encode(data, indent_level, opts), do: Ymlr.Encode.list(data, indent_level, opts)
 end
 
 defimpl Ymlr.Encoder, for: Tuple do
-  def encode(data, idnent_level, opts) do
-    Ymlr.Encode.list(Tuple.to_list(data), idnent_level, opts)
+  def encode(data, indent_level, opts) do
+    Ymlr.Encode.list(Tuple.to_list(data), indent_level, opts)
   end
 end
 
 defimpl Ymlr.Encoder, for: Atom do
-  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.atom(data)
+  def encode(data, _indent_level, _opts), do: Ymlr.Encode.atom(data)
 end
 
 defimpl Ymlr.Encoder, for: BitString do
@@ -251,11 +251,11 @@ defimpl Ymlr.Encoder, for: BitString do
 end
 
 defimpl Ymlr.Encoder, for: Integer do
-  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.number(data)
+  def encode(data, _indent_level, _opts), do: Ymlr.Encode.number(data)
 end
 
 defimpl Ymlr.Encoder, for: Float do
-  def encode(data, _idnent_level, _opts), do: Ymlr.Encode.number(data)
+  def encode(data, _indent_level, _opts), do: Ymlr.Encode.number(data)
 end
 
 defimpl Ymlr.Encoder, for: Decimal do
