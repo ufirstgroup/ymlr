@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+### Fixed
+
+- fixed typo in spec: `idnent_level` => `indent_level`
+
 <!--------------------- Don't add new entries after this line --------------------->
 
 ## [5.1.3] - 2024-03-12
