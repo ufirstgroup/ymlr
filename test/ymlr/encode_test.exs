@@ -611,6 +611,5 @@ defmodule Ymlr.EncodeTest do
     test "datetime in map" do
       assert_output(%{"ts" => ~U[2016-05-24 13:26:08Z]}, "ts: 2016-05-24T13:26:08Z")
     end
-
   end
 end
