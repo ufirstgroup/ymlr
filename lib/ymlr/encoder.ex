@@ -258,10 +258,11 @@ defimpl Ymlr.Encoder, for: Float do
   def encode(data, _indent_level, _opts), do: Ymlr.Encode.number(data)
 end
 
-defimpl Ymlr.Encoder, for: Decimal do
-  def encode(data, _indent_level, _opts) do
-    # silence the xref warning
-    decimal = Decimal
-    decimal.to_string(data)
+if Code.ensure_loaded?(Decimal) do
+  defimpl Ymlr.Encoder, for: Decimal do
+    def encode(data, _indent_level, _opts) do
+      # silence the xref warning
+      Decimal.to_string(data)
+    end
   end
 end
