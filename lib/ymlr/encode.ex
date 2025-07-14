@@ -186,7 +186,7 @@ defmodule Ymlr.Encode do
       iex> Ymlr.Encode.to_s!(%{})
       "{}"
 
-      iex> Ymlr.Encode.to_s!(%{a: 1, b: 2})
+      iex> Ymlr.Encode.to_s!(%{a: 1, b: 2}, sort_maps: true)
       "a: 1\nb: 2"
 
       iex> Ymlr.Encode.to_s!(%{"a" => "a", "b" => :b, "c" => "true", "d" => "100"})
@@ -204,7 +204,7 @@ defmodule Ymlr.Encode do
 
   ## Examples
 
-      iex> Ymlr.Encode.to_s(%{a: 1, b: 2})
+      iex> Ymlr.Encode.to_s(%{a: 1, b: 2}, sort_maps: true)
       {:ok, "a: 1\nb: 2"}
   """
   @spec to_s(data :: term(), opts :: Encoder.opts()) :: {:ok, binary()} | {:error, binary()}
