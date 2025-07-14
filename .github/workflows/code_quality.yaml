@@ -1,75 +1,17 @@
 name: Code Quality
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
-env:
-  MIX_ENV: test
-
 jobs:
   test:
-    runs-on: ubuntu-latest
-    name: Check Code Quality
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: erlef/setup-beam@v1
-        id: beam
-        with:
-          version-file: .tool-versions
-          version-type: strict
-          install-rebar: true
-          install-hex: true
-
-      - name: Retrieve Build Cache
-        uses: actions/cache@v4
-        id: build-folder-cache
-        with:
-          path: _build
-          key: ${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-build-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-
-      - name: Retrieve Mix Dependencies Cache
-        uses: actions/cache@v4
-        id: deps-cache
-        with:
-          path: deps
-          key: ${{runner.os}}-${{steps.beam.outputs.otp-version}}-${{steps.beam.outputs.elixir-version}}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-
-      # Copied from the example on https://github.com/jeremyjh/dialyxir/blob/master/README.md#github-actions
-      - name: Restore PLT Cache
-        uses: actions/cache@v4
-        id: plt_cache
-        with:
-          key: |
-            ${{ runner.os }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-plt
-          restore-keys: |
-            ${{ runner.os }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-plt
-          path: |
-            priv/plts
-
-      - name: Install Mix Dependencies
-        run: mix deps.get
-
-      - name: Check Formatting
-        run: mix format --check-formatted
-
-      - name: Run Credo
-        run: mix credo --strict
-
-      - name: Run Coverage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mix coveralls.github --include integration
-
-      # Create PLTs if no cache was found
-      - name: Create PLTs
-        if: steps.plt_cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p priv/plts
-          mix dialyzer
-
-      - name: Run dialyzer
-        run: mix dialyzer --format github
+    uses: mruoss/action_elixir_run_tests/.github/workflows/elixir-code-quality.yml@v1.3.0
+    with:
+      checkout: true
+      with-kubernetes: true
+      check-formatting: true
+      run-credo: strict
+      run-dialyzer: true
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
