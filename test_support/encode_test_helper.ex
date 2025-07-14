@@ -25,7 +25,7 @@ defmodule Ymlr.EncodeTestHelper do
 
   defp do_assert_output(input, exptected_output, opts) do
     quote do
-      assert Ymlr.Encode.to_s!(unquote(input), atoms: unquote(opts)[:atoms])
+      assert Ymlr.Encode.to_s!(unquote(input), atoms: unquote(opts)[:atoms], sort_maps: true)
 ==
                unquote(exptected_output)
     end
