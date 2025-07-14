@@ -2,7 +2,7 @@ defmodule Ymlr.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/ufirstgroup/ymlr"
-  @version "5.1.3"
+  @version "5.1.4"
 
   def project do
     [
