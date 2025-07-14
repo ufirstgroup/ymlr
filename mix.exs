@@ -63,6 +63,7 @@ defmodule Ymlr.MixProject do
   defp dialyzer do
     [
       ignore_warnings: ".dialyzer_ignore.exs",
+      flags: [:no_opaque],
       plt_add_apps: [:mix, :eex],
       plt_core_path: "priv/plts",
       plt_local_path: "priv/plts"
