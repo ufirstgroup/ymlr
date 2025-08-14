@@ -1,0 +1,8 @@
+min_version = "2025.1.0"
+
+[tasks.init]
+description = "Run initialization for this repo."
+run = ["mise install --yes", "mise exec -- pre-commit install --install-hooks"]
+
+[tools]
+"pipx:pre-commit" = { uvx_args = "--index='https://pypi.org/simple/' --link-mode=copy", version = "4.0.1" }
