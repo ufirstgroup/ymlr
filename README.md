@@ -127,3 +127,9 @@ You can find the last Benchmark in [BENCHMARK.md](BENCHMARK.md)
 cd benchmark/
 elixir run.exs
 ```
+
+## Development
+
+We're using [mise-en-place](https://mise.jdx.dev/) to install and manage
+tooling. Please [install it](https://mise.jdx.dev/getting-started.html) and run
+`mise init` before you start coding. This will also setup pre-commit hooks
