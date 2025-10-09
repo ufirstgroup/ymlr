@@ -213,6 +213,10 @@ defimpl Ymlr.Encoder, for: Map do
   def encode(data, indent_level, opts), do: Ymlr.Encode.map(data, indent_level, opts)
 end
 
+defimpl Ymlr.Encoder, for: Ymlr.KeywordMap do
+  def encode(data, indent_level, opts), do: Ymlr.Encode.map(data.entries, indent_level, opts)
+end
+
 defimpl Ymlr.Encoder, for: [Date, Time, NaiveDateTime] do
   def encode(data, _level, _opts), do: @for.to_iso8601(data)
 end

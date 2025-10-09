@@ -4,6 +4,13 @@ defmodule YmlrTest do
 
   alias Ymlr, as: MUT
 
+  describe "document!/1" do
+    test "KeywordMap preserves order" do
+      assert MUT.document!(%MUT.KeywordMap{entries: [foo: 1, bar: 2, baz: 3]}) ==
+               "---\nfoo: 1\nbar: 2\nbaz: 3\n"
+    end
+  end
+
   describe "document/2" do
     test "no comment" do
       assert MUT.document!({[], %{a: 1}}) == "---\na: 1\n"

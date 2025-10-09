@@ -218,7 +218,7 @@ defmodule Ymlr.Encode do
   @spec map(data :: map(), indent_level :: integer, opts :: Encoder.opts()) :: iodata()
   def map(data, _indent_level, _opts) when data == %{}, do: "{}"
 
-  def map(data, indent_level, opts) when is_map(data) do
+  def map(data, indent_level, opts) do
     indentation = indent(indent_level)
     key_encoder = if opts[:atoms], do: &encode_map_key_atoms/1, else: &encode_map_key/1
     data = if opts[:sort_maps], do: Enum.sort(data), else: data
