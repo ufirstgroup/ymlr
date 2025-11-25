@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#MISE description="Run initialization for this repo."
+
+mise install --yes
+mise generate git-pre-commit --write --task=pre-commit

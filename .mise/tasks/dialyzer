@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Run 'mix dialyzer'."
+#MISE sources="^lib/"
+#MISE env={MIX_ENV = "dev"}
+#MISE depends=["deps"]
+
+mise x erlang elixir -- mix dialyzer

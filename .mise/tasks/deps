@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Install project dependencies."
+#MISE sources=["mix.exs", "mix.lock"]
+#MISE outputs=["deps"]
+#MISE env={MIX_ENV = "dev"}
+
+mise x erlang elixir -- mix deps.get
