@@ -13,7 +13,6 @@ defmodule Ymlr.MixProject do
       deps: deps(),
       dialyzer: dialyzer(),
       package: package(),
-      preferred_cli_env: cli_env(),
       consolidate_protocols: Mix.env() != :test,
       test_coverage: [
         tool: ExCoveralls
@@ -34,7 +33,7 @@ defmodule Ymlr.MixProject do
     ]
   end
 
-  defp cli_env do
+  def cli do
     [
       coveralls: :test,
       "coveralls.detail": :test,

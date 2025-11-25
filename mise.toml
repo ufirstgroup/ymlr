@@ -1,0 +1,11 @@
+min_version = "2025.1.0"
+
+[tools]
+"erlang" = "28"
+"elixir" = "1.19"
+
+[settings]
+lockfile = true
+
+[tasks.deps2]
+run = "mix deps.get"

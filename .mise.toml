@@ -1,5 +1,0 @@
-min_version = "2025.1.0"
-
-[tools]
-"erlang" = "28.2"
-"elixir" = "1.19.3"
