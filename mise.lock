@@ -1,0 +1,15 @@
+[[tools.elixir]]
+version = "1.19.3-otp-28"
+backend = "core:elixir"
+
+[tools.elixir.platforms.macos-arm64]
+checksum = "blake3:a4aa9e3a4aff0137d18c760861b1188de915198a4f7f7531e61557ea27842c2a"
+size = 8244235
+
+[[tools.erlang]]
+version = "28.2"
+backend = "core:erlang"
+
+[tools.erlang.platforms.macos-arm64]
+checksum = "blake3:66ebfb41f82144fdee661000863097843e9d870eb1488ec47541600aa7a385be"
+size = 70064920
