@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Run 'mix format'."
+#MISE sources="^lib/"
+#MISE env={MIX_ENV = "dev"}
+
+mise x erlang elixir -- mix format

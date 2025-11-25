@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#MISE description="mise pre-commit hook."
+#MISE env={MIX_ENV = "dev"}
+#MISE depends=["credo", "dialyzer", "format"]
