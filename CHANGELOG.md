@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+### Fixed
+
+- Quote strings that start or end with tab characters [[#289](https://github.com/ufirstgroup/ymlr/issues/289)]
+
 ## [5.1.4] - 2025-07-14
 
 <!--------------------- Don't add new entries after this line --------------------->
