@@ -67,6 +67,7 @@ defmodule Ymlr.Encode do
 
   @quote_when_starts_with_strings [
     " ",
+    "\t",
     # tag
     "!",
     # anchor
@@ -122,7 +123,7 @@ defmodule Ymlr.Encode do
 
   @quote_when_contains_string [" #", ": "]
 
-  @quote_when_last_char [?\s, ?:]
+  @quote_when_last_char [?\s, ?\t, ?:]
 
   @single_quote_when_exact [
     "",

@@ -37,10 +37,12 @@ defmodule Ymlr.EncodeTest do
       # leading whitespace(s)
       assert_identity(" leading")
       assert_identity("  leading")
+      assert_identity_and_output("\tleading", "'\tleading'")
       assert_identity_and_output(" '", ~S(" '"))
       # trailing whitespace(s)
       assert_identity("trailing ")
       assert_identity("trailing  ")
+      assert_identity_and_output("trailing\t", "'trailing\t'")
       assert_identity("a'  ")
       assert_identity_and_output("' ", ~S("' "))
     end
