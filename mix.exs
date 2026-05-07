@@ -50,7 +50,7 @@ defmodule Ymlr.MixProject do
   defp deps do
     [
       {:credo, "~> 1.5-pre", only: [:dev, :test], runtime: false},
-      {:decimal, "~> 2.0", only: [:test], runtime: false},
+      {:decimal, "~> 3.0", only: [:test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.18", only: [:test]},
       {:ex_doc, "~> 0.40", only: :dev},
