@@ -19,3 +19,12 @@ precompiled = "if_available"
 checksum = "sha256:f365335cf6c705b52557f4d3a4c4058e2e689a0e58d822160688d0cc8a736b92"
 url = "https://github.com/erlef/otp_builds/releases/download/OTP-28.5/otp-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/403427927"
+
+[[tools.erlang]]
+version = "28.5"
+backend = "core:erlang"
+
+[tools.erlang."platforms.macos-arm64"]
+checksum = "sha256:f365335cf6c705b52557f4d3a4c4058e2e689a0e58d822160688d0cc8a736b92"
+url = "https://github.com/erlef/otp_builds/releases/download/OTP-28.5/otp-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/403427927"
