@@ -39,9 +39,8 @@ defmodule Ymlr do
   @spec document!(document, opts :: Keyword.t()) :: binary()
   def document!(document, opts \\ [])
 
-  def document!({lines, data}, opts) when is_list(lines) do
-    comments = Enum.map_join(lines, "", &"# #{&1}\n")
-    "---\n" <> comments <> Encode.to_s!(data, opts) <> "\n"
+  def document!({comments, data}, opts) when is_list(comments) do
+    "---\n" <> sanitize_comments(comments) <> Encode.to_s!(data, opts) <> "\n"
   end
 
   def document!({comment, data}, opts), do: document!({[comment], data}, opts)
@@ -151,5 +150,11 @@ defmodule Ymlr do
 
     e in ArgumentError ->
       {:error, Exception.message(e)}
+  end
+
+  defp sanitize_comments(comments) do
+    comments
+    |> Enum.flat_map(&String.split(&1, "\n", trim: true))
+    |> Enum.map_join("", &"# #{&1}\n")
   end
 end
