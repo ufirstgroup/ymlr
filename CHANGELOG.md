@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 <!-- ### Added | Changed | Deprecated | Removed | Fixed | Security -->
 
+### Security
+
+* Fix YAML injection via unescaped newlines in comments by making sure every line is prefixed with `# `.
+
 <!--------------------- Don't add new entries after this line --------------------->
 
 ## [5.1.5] - 2026-03-15
