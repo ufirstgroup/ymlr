@@ -9,6 +9,11 @@ defmodule YmlrTest do
       assert MUT.document!({[], %{a: 1}}) == "---\na: 1\n"
     end
 
+    test "comment with newlines" do
+      assert MUT.document!({["comment\nwith\nnewlines"], %{a: 1}}) ==
+               "---\n# comment\n# with\n# newlines\na: 1\n"
+    end
+
     test "k8s resource" do
       {:ok, input} = YamlElixir.read_from_file("test_support/fixtures/iam_policy.yaml")
 
