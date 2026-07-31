@@ -10,8 +10,8 @@ defmodule YmlrTest do
     end
 
     test "comment with newlines" do
-      assert MUT.document!({["comment\nwith\nnewlines"], %{a: 1}}) ==
-               "---\n# comment\n# with\n# newlines\na: 1\n"
+      assert MUT.document!({["comment\nwith\r\nsome\rnewlines"], %{a: 1}}) ==
+               "---\n# comment\n# with\n# some\n# newlines\na: 1\n"
     end
 
     test "k8s resource" do

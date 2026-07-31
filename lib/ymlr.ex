@@ -154,7 +154,7 @@ defmodule Ymlr do
 
   defp sanitize_comments(comments) do
     comments
-    |> Enum.flat_map(&String.split(&1, "\n", trim: true))
+    |> Enum.flat_map(&String.split(&1, ["\r\n", "\n", "\r"], trim: true))
     |> Enum.map_join("", &"# #{&1}\n")
   end
 end
