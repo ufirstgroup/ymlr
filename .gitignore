@@ -37,3 +37,6 @@ k8s-*.tar
 .direnv
 .env
 .envrc.private
+
+# Local hk overrides
+hk.local.pkl

@@ -1,0 +1,72 @@
+amends "package://github.com/jdx/hk/releases/download/v1.50.0/hk@1.50.0#/Config.pkl"
+
+min_hk_version = "1.50.0"
+
+env {
+    ["MIX_ENV"] = "dev"
+}
+
+local elixir_glob = List("**/*.ex", "**/*.exs")
+local elixir_exclude = List("deps/**/*", "_build/**/*")
+local mix = "mise x erlang elixir --"
+
+local deps = new Step {
+    check = "mise run deps"
+    exclusive = true
+}
+
+local mix_format = new Step {
+    glob = elixir_glob
+    exclude = elixir_exclude
+    prefix = mix
+    depends = "deps"
+    check = "mix format --check-formatted"
+    fix = "mix format"
+}
+
+local credo = new Step {
+    glob = elixir_glob
+    exclude = elixir_exclude
+    prefix = mix
+    depends = List("deps", "mix-format")
+    check = "mix credo --strict"
+}
+
+local dialyzer = new Step {
+    glob = elixir_glob
+    exclude = elixir_exclude
+    prefix = mix
+    depends = "deps"
+    check = "mix dialyzer"
+}
+
+local fast_linters = new Mapping<String, Step> {
+    ["deps"] = deps
+    ["mix-format"] = mix_format
+    ["credo"] = credo
+}
+
+local all_linters = (fast_linters) {
+    ["dialyzer"] = dialyzer
+}
+
+hooks {
+    ["pre-commit"] {
+        fix = true
+        stash = "git"
+        steps = fast_linters
+    }
+    ["pre-push"] {
+        steps {
+            ["deps"] = deps
+            ["dialyzer"] = dialyzer
+        }
+    }
+    ["fix"] {
+        fix = true
+        steps = fast_linters
+    }
+    ["check"] {
+        steps = all_linters
+    }
+}

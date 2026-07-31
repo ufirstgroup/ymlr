@@ -2,4 +2,5 @@
 #MISE description="Run initialization for this repo."
 
 mise install --yes
-mise generate git-pre-commit --write --task=pre-commit
+rm -f .git/hooks/pre-commit
+mise x hk -- hk install --mise
