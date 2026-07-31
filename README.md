@@ -132,4 +132,18 @@ elixir run.exs
 
 We're using [mise-en-place](https://mise.jdx.dev/) to install and manage
 tooling. Please [install it](https://mise.jdx.dev/getting-started.html) and run
-`mise init` before you start coding. This will also setup pre-commit hooks
+`mise init` before you start coding. This installs the toolchain and sets up the
+git hooks via [hk](https://hk.jdx.dev/).
+
+The hooks are configured in [hk.pkl](hk.pkl):
+
+- `pre-commit` runs `mix format` (fixes are staged automatically) followed by
+  `mix credo --strict`
+- `pre-push` runs `mix dialyzer`
+
+You can run the checks yourself at any time:
+
+```bash
+hk check --all   # everything, read-only
+hk fix --all     # apply formatting fixes
+```
