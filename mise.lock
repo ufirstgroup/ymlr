@@ -18,7 +18,7 @@ url = "https://github.com/erlef/otp_builds/releases/download/OTP-28.5/otp-aarch6
 url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/403427927"
 
 [[tools.hk]]
-version = "1.58.1"
+version = "2.0.1"
 backend = "aqua:jdx/hk"
 
 [tools.hk."platforms.macos-arm64"]
