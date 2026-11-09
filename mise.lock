@@ -18,11 +18,11 @@ url = "https://github.com/erlef/otp_builds/releases/download/OTP-28.5/otp-aarch6
 url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/403427927"
 
 [[tools.hk]]
-version = "2.11.0"
+version = "2.12.0"
 backend = "aqua:jdx/hk"
 
 [tools.hk."platforms.macos-arm64"]
-checksum = "sha256:65cc3490e93522b55abe8ae42c2b5ffe452f9fe58282455ad59d10bc0deab272"
+checksum = "sha256:269c17d47e884c19adb77144d5957e854fc5fc6a1a6f9c1a0a5b19431e2fabb8"
 checksum_source = "mise-versions"
-url = "https://github.com/jdx/hk/releases/download/v2.11.0/hk-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/jdx/hk/releases/assets/698007103"
+url = "https://github.com/jdx/hk/releases/download/v2.12.0/hk-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/jdx/hk/releases/assets/728911206"
